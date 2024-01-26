@@ -1,0 +1,165 @@
+
+\section*{Question 1}
+
+\begin{enumerate}[(a)]
+    \item $f(v_t,\theta) = $
+    \[
+\begin{bmatrix}
+    R_{t1}-\mu_1 \\
+    R_{t2}-\mu_2\\
+    (R_{t1}-\mu_1)^2-\sigma_1^2 \\
+    (R_{t2}-\mu_2)^2-\sigma_2^2 \\
+\end{bmatrix}
+\]
+$\theta = $
+ \[
+\begin{bmatrix}
+    \mu_1 \\
+    \mu_2\\
+    \sigma_1^2 \\
+    \sigma_2^2 \\
+\end{bmatrix}
+\]
+$\frac{\partial f}{\partial \theta'}$
+ \[
+\begin{bmatrix}
+    -1&0&0&0 \\
+    0&-1&0&0\\
+    -2(R_{t1}-\mu_1)&0&-1&0 \\
+    0&-2(R_{t2}-\mu_2)&0&-1 \\
+\end{bmatrix}
+\]
+$\hat{D_T}=\frac{1}{T}\sum \frac{\partial f}{\partial \theta '}=$
+ \[
+\begin{bmatrix}
+    -1&0&0&0 \\
+    0&-1&0&0\\
+    0&0&-1&0 \\
+    0&0&0&-1 \\
+\end{bmatrix}
+\]
+$A_T=I$\\
+$A_T g_T(\theta)=0$\\
+$g_T(\theta) =0 =$
+ \[
+\begin{bmatrix}
+    \frac{\sum R_{t1}}{T} - \mu_1 \\
+    \frac{\sum R_{t2}}{T} - \mu_2\\
+     \frac{\sum (R_{t1} - \mu_1)^2 }{T}- \sigma_1^2 \\
+    \frac{\sum (R_{t2}- \mu_2)^2}{T}  - \sigma_2^2\\
+\end{bmatrix}
+\]
+therefore, \\
+$\hat{\mu_1} = \frac{\sum R_{t1}}{T}$
+$\hat{\mu_2} = \frac{\sum R_{t2}}{T}$
+$\hat{\sigma_1^2}=\frac{\sum (R_{t1}-\hat{\mu_1})^2}{T}$
+$\hat{\sigma_2^2}=\frac{\sum (R_{t2}-\hat{\mu_2})^2}{T}$
+
+\item 
+$f(v,\theta) f(v,\theta)'=$
+\[
+\begin{bmatrix}
+  R_{t1}-\mu_1 \\
+    R_{t2}-\mu_2\\
+    (R_{t1}-\mu_1)^2-\sigma_1^2 \\
+    (R_{t2}-\mu_2)^2-\sigma_2^2 \\
+\end{bmatrix}
+\begin{bmatrix}
+ R_{t1}-\mu_1 &
+    R_{t2}-\mu_2&
+    (R_{t1}-\mu_1)^2-\sigma_1^2 &
+    (R_{t2}-\mu_2)^2-\sigma_2^2 
+\end{bmatrix}
+\]
+given $R1 \sim N(\mu_1,\sigma_1^2)$ and $R2 \sim N(\mu_2,\sigma_2^2)$\\
+
+$\hat{S_T}=$
+\[
+\begin{bmatrix}
+  \hat{\sigma_1}^2 &0&0&0\\
+    0&\hat{\sigma_2}^2&0&0\\
+    0&0&2\hat{\sigma_1}^4&0 \\
+    0&0&0&2\hat{\sigma_2}^4 \\
+\end{bmatrix}
+\]
+
+\item 
+$f(v_t,\theta) f(v_{t-1},\theta)'=$
+\[
+\begin{bmatrix}
+  R_{t1}-\mu_1 \\
+    R_{t2}-\mu_2\\
+    (R_{t1}-\mu_1)^2-\sigma_1^2 \\
+    (R_{t2}-\mu_2)^2-\sigma_2^2 \\
+\end{bmatrix}
+\begin{bmatrix}
+ R_{t1-1}-\mu_1 &
+    R_{t2-1}-\mu_2&
+    (R_{t1-1}-\mu_1)^2-\sigma_1^2 &
+    (R_{t2-1}-\mu_2)^2-\sigma_2^2 
+\end{bmatrix}
+\]
+
+$\hat{\Gamma_1}=$
+% \resizebox{\textwidth}{!}{
+\[
+\begin{bmatrix}
+  \frac{\sum^T_2 (R_{t1}-\mu_1)(R_{t1-1}-\mu_1)}{T-1} &0&  \frac{\sum^T_2 (R_{t1}-\mu_1)(R_{t1-1}-\mu_1)^2}{T-1} &0\\
+    0& \frac{\sum^T_2 (R_{t2}-\mu_2)(R_{t2-1}-\mu_2)}{T-1} &0 & \frac{\sum^T_2 (R_{t2}-\mu_2)(R_{t2-1}-\mu_2)^2}{T-1}\\
+    \frac{\sum^T_2 (R_{t1-1}-\mu_1)(R_{t1-1}-\mu_1)^2}{T-1} &0 &\frac{\sum^T_2 (R_{t1-1}-\mu_1)^2(R_{t1-1}-\mu_1)^2}{T-1}+\sigma_1^4 &0\\
+    0 & \frac{\sum^T_2 (R_{t2-1}-\mu_2)(R_{t2-1}-\mu_2)^2}{T-1} & 0 & \frac{\sum^T_2 (R_{t2-1}-\mu_2)^2(R_{t2-1}-\mu_2)^2}{T-1}+\sigma_2^4\\  
+\end{bmatrix}
+\]
+% }
+
+$\hat{S_T} = $
+\[
+\begin{bmatrix}
+  \sigma_1^2 & 0 & 0 &0 \\
+  0 & \sigma_2^2 &0 &0 \\
+  0 & 0 & 2\sigma_1^4 & 0 \\
+  0 & 0 & 0 & 2\sigma_2^4 \\
+\end{bmatrix}
++\frac{1}{2}(\hat{\Gamma_1}+\hat{\Gamma_1}')
+\]
+
+\item 
+$H_0: \mu_1*\sigma_2 - \mu_2*\sigma_1 = 0 $\\
+$R (\theta) = \mu_1*\sigma_2 - \mu_2*\sigma_1$\\
+$\theta = $
+\[
+\begin{bmatrix}
+  \mu_1 \\
+  \mu_2 \\
+  \sigma_1\\
+  \sigma_2 \\
+\end{bmatrix}
+\]
+$\frac{\partial R(\theta)}{\theta '}=$
+\[
+\begin{bmatrix}
+  \sigma_2 & -\sigma_1 & -\mu_2 & \mu_1
+\end{bmatrix}
+\]
+$T(R(\hat{\theta_T})'[\frac{\partial R(\theta)}{\theta '}\hat{V}\frac{\partial R(\theta)}{\theta '}']^{-1}(R(\hat{\theta}) \sim \chi^2$\\
+Sharpe Ratio Stock 1: 0.1113\\
+Sharpe Ratio Stock 2: 0.0352\\
+T-test Statistic: 1.4645\\
+p-value: 0.1433
+Fail to reject the null hypothesis: No significant difference in Sharpe ratios.
+\item 
+After  introducing the correlation matrix: \\
+Sharpe Ratio Stock 1: 0.1113\\
+Sharpe Ratio Stock 2: 0.0352\\
+Sample Correlation: 0.4187\\
+T-test Statistic: 12.5329\\
+Degrees of Freedom: 1198\\
+p-value: 0.0000\\
+Reject the null hypothesis: Stocks have different Sharpe ratios.
+\item 
+Observed Sharpe Ratio Difference: 0.0761\\
+95\% Confidence Interval: [-0.0325, 0.1561]\\
+The sharp ratio difference is not significant at 5\% level.
+
+\end{enumerate}
+
