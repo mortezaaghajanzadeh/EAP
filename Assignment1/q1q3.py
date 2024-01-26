@@ -225,3 +225,48 @@ plt.xlabel('Phi')
 plt.tight_layout()
 plt.show()
 # %%
+#(b)
+# Simulate data
+np.random.seed(123)
+n_obs = 840
+beta = 0
+
+x = np.zeros(n_obs)
+u = np.random.normal(0, 0.1, size=n_obs)
+
+for t in range(1, n_obs):
+    x[t] = beta * x[t-1] + u[t]
+
+# Create 12-month log-return series
+log_returns = np.log(x[12:] / x[:-12])
+
+# Create lagged variable
+x_lagged = x[:-12]
+
+# Add a constant term to the independent variable for the intercept
+X = sm.add_constant(x_lagged)
+
+# Dependent variable
+y = log_returns
+
+# Fit OLS model
+model = sm.OLS(y, X)
+results = model.fit()
+
+# Print summary statistics
+print(results.summary())
+
+# Hypothesis testing: H0: beta_K = 0
+t_stat = results.tvalues[1]  # t-statistic for the coefficient beta_K
+p_value = results.pvalues[1]  # p-value for the coefficient beta_K
+
+print("t-statistic:", t_stat)
+print("p-value:", p_value)
+
+# Check for significance at a 5% level
+alpha = 0.05
+if p_value < alpha:
+    print('Reject the null hypothesis: beta_K is significantly different from 0.')
+else:
+    print('Fail to reject the null hypothesis: No significant evidence against beta_K = 0.')
+# %%
