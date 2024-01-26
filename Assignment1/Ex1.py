@@ -8,9 +8,20 @@ import statsmodels.api as sm
 #%%
 #set seed 
 np.random.seed(123)
-# %%
-#question 1
+# %% Reading the Data
 df = pd.read_excel("Assignment1Data_G1.xlsx" , sheet_name="TwoStocks")
+df.head()
+#%% (a) compute the point estimates
+mu_1 = sum(df['Stock1'])/len(df['Stock1'])
+mu_2 = sum(df['Stock2'])/len(df['Stock2'])
+print("The point estimates for the mean of stock 1 and stock 2 are {} and {} respectively".format(round(mu_1,4),round(mu_2,4)))
+sigma_1 = sum((df.Stock1 - mu_1)**2)/(len(df.Stock1))
+sigma_2 = sum((df.Stock2 - mu_2)**2)/(len(df.Stock2))
+print("The point estimates for the variance of stock 1 and stock 2 are {} and {} respectively".format(round(sigma_1,4),round(sigma_2,4)))
+
+
+
+#%%
 R1 = df['Stock1'].values
 R2 = df['Stock2'].values
 sharpe_ratio_stock1 = np.mean(R1) / np.std(R1)

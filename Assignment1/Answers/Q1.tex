@@ -62,12 +62,44 @@ We also know that $A_T = I$ and $A_T g_T(\theta) = 0$. Therefore, we can calcula
     \end{bmatrix} = \hat{\theta} \\
   \end{aligned}
 \end{equation*}
+
+Our calculated $\hat{\theta}$ based on the given data is:
+\begin{equation*}
+  \hat{\theta} = \begin{bmatrix}
+     0.0162 \\
+     0.0045 \\
+     0.0212 \\
+     0.0167 \\
+  \end{bmatrix}
+\end{equation*}
+\begin{center}
+  \begin{lstlisting}[language=Python, caption=Python code for calculating $\hat{\theta}$, label={lst:q1a}, escapechar=|, frame=single, basicstyle=\small, showstringspaces=false, captionpos=b, breaklines=true, showspaces=false, showtabs=false, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+    mu_1 = sum(df['Stock1'])/len(df['Stock1'])
+    mu_2 = sum(df['Stock2'])/len(df['Stock2'])
+    sigma_1 = sum((df.Stock1 - mu_1)**2)/(len(df.Stock1))
+    sigma_2 = sum((df.Stock2 - mu_2)**2)/(len(df.Stock2))
+  \end{lstlisting}
+\end{center}
+\item Still we assume that there is no serial correlation in the moments. Therefore, we can calculate the $\hat{S_T}$ as follows:
+\begin{equation*}
+  \begin{aligned}
+    \hat{S_T} = & \frac{1}{T} \sum_{t=1}^T f(v_t,\theta) f(v_t,\theta)'\\
+    =& \frac{1}{T}\sum_{t=1}^T\scalemath{0.5}{ \begin{bmatrix}
+      (R_{t1} - \mu_1)^2 & (R_{t1} - \mu_1)(R_{t2} - \mu_2) & (R_{t1} - \mu_1)^3 - \sigma_1^2(R_{t1} - \mu_1) & (R_{t1} - \mu_1)(R_{t2} - \mu_2)^2 - \sigma_2^2(R_{t1} - \mu_1)\\
+      (R_{t1} - \mu_1)(R_{t2} - \mu_2) & (R_{t2} - \mu_2)^2 & (R_{t1} - \mu_1)^2(R_{t2} - \mu_2) - \sigma_1^2(R_{t2} - \mu_2) & (R_{t2} - \mu_2)^3 - \sigma_2^2(R_{t2} - \mu_2)\\
+      (R_{t1} - \mu_1)^3 - \sigma_1^2(R_{t1} - \mu_1) & (R_{t1} - \mu_1)^2(R_{t2} - \mu_2) - \sigma_1^2(R_{t2} - \mu_2) & (R_{t1} - \mu_1)^4 - 2\sigma_1^2(R_{t1} - \mu_1)^2 + \sigma_1^4 & (R_{t1} - \mu_1)^2(R_{t2} - \mu_2)^2 - \sigma_1^2(R_{t1} - \mu_1)\sigma_2^2(R_{t2} - \mu_2)\\
+      (R_{t1} - \mu_1)(R_{t2} - \mu_2)^2 - \sigma_2^2(R_{t1} - \mu_1) & (R_{t2} - \mu_2)^3 - \sigma_2^2(R_{t2} - \mu_2) & (R_{t1} - \mu_1)^2(R_{t2} - \mu_2)^2 - \sigma_1^2(R_{t1} - \mu_1)\sigma_2^2(R_{t2} - \mu_2) & (R_{t2} - \mu_2)^4 - 2\sigma_2^2(R_{t2} - \mu_2)^2 + \sigma_2^4\\
+    \end{bmatrix}} \\
+  \end{aligned}
+\end{equation*}
+
+
+
 \end{enumerate}
 
 
-
 \begin{enumerate}[(a)]
-%     \item $f(v_t,\theta) = $
+    \item $f(v_t,\theta) = $
 %     \[
 % \begin{bmatrix}
 %     R_{t1}-\mu_1 \\

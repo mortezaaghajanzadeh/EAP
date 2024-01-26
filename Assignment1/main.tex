@@ -22,6 +22,7 @@
 \pgfplotsset{compat=1.12}
 \usetikzlibrary{patterns}
 \usepgfplotslibrary{fillbetween}
+\usepackage{listings}
 \def \p{\par
 \vspace{10pt}}
 
@@ -39,6 +40,9 @@
 
 \date{\today}
 \setlength\parindent{0pt}
+
+\newcommand\scalemath[2]{\scalebox{#1}{\mbox{\ensuremath{\displaystyle #2}}}}
+
 
 \begin{document}
 	\maketitle
