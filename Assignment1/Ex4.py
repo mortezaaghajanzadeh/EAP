@@ -104,6 +104,7 @@ for prediction_model in ['BM',"DP", "OLS", "CM"]:
     prediction_data.loc[prediction_data.omega_hat >= 2,'omega_hat_'+prediction_model] = 2
     prediction_data.loc[prediction_data.omega_hat <= -1,'omega_hat_'+prediction_model] = -1
     prediction_data['r_p_'+prediction_model] = prediction_data['ExcessRet'] + prediction_data['omega_hat_'+prediction_model]*prediction_data['ExcessRet']
+prediction_data.to_excel("Out/prediction_data.xlsx",index=False)
 portfolio = pd.DataFrame()
 portfolio = prediction_data[['Month','r_p_BM','r_p_DP','r_p_OLS','r_p_CM']].copy()
 portfolio = portfolio.dropna()
