@@ -1,59 +1,124 @@
 
 \section*{Question 1}
+\begin{enumerate}[(a)]
+  \item Let's define the variables that we need to use in the estimation.\\
+  \begin{equation*}
+  \begin{aligned}
+    f(v_t,\theta) = & \begin{bmatrix}
+      R_{t1} - \mu_1 \\
+      R_{t2} - \mu_2 \\
+      (R_{t1} - \mu_1)^2 - \sigma_1^2 \\
+      (R_{t2} - \mu_2)^2 - \sigma_2^2
+    \end{bmatrix} & , \quad 
+    \theta = & \begin{bmatrix}
+      \mu_1 \\
+      \mu_2 \\
+      \sigma_1^2 \\
+      \sigma_2^2
+    \end{bmatrix}  \\
+    g_T(\theta) = & \quad \frac{1}{T} \sum_{t=1}^T f(v_t,\theta) & \\
+  \end{aligned}
+  \end{equation*}
+We know from the lecture that we need to calculate the $\frac{\partial f}{\partial \theta'}$ to get the $\hat{D_T}$:
+\begin{equation*}
+  \begin{aligned}
+    \frac{\partial f(v_t,\theta)}{\partial \theta'} = & \begin{bmatrix}
+      -1 & 0 & 0 & 0 \\
+      0 & -1 & 0 & 0 \\
+      -2(R_{t1} - \mu_1) & 0 & -1 & 0 \\
+      0 & -2(R_{t2} - \mu_2) & 0 & -1
+    \end{bmatrix} \\\\
+    \Rightarrow \hat{D_T} = & \frac{1}{T} \sum_{t=1}^T \frac{\partial f(v_t,\theta)}{\partial \theta'} = \begin{bmatrix}
+      -1 & 0 & 0 & 0 \\
+      0 & -1 & 0 & 0 \\
+      0 & 0 & -1 & 0 \\
+      0 & 0 & 0 & -1
+    \end{bmatrix} = -I\\
+  \end{aligned}
+\end{equation*}
+We also know that $A_T = I$ and $A_T g_T(\theta) = 0$. Therefore, we can calculate the $\hat{\theta}$:
+\begin{equation*}
+  \begin{aligned}
+    A_T g_T(\theta) & = 0 \Rightarrow \quad g_T(\theta) =  0 
+  \end{aligned}
+\end{equation*}
+\begin{equation*}
+  \begin{aligned}
+    g_T(\theta) = \begin{bmatrix}
+      \frac{\sum R_{t1}}{T} - \mu_1 \\
+      \frac{\sum R_{t2}}{T} - \mu_2\\
+       \frac{\sum (R_{t1} - \mu_1)^2 }{T}- \sigma_1^2 \\
+      \frac{\sum (R_{t2}- \mu_2)^2}{T}  - \sigma_2^2\\
+  \end{bmatrix} = 0 \Rightarrow &  \begin{bmatrix}
+      \frac{\sum_{t=1}^T R_{t1}}{T} \\
+      \frac{\sum_{t=1}^T R_{t2}}{T} \\
+      \frac{\sum_{t=1}^T (R_{t1} - \hat{\mu_1})^2}{T} \\
+      \frac{\sum_{t=1}^T (R_{t2} - \hat{\mu_2})^2}{T}
+    \end{bmatrix} = \begin{bmatrix}
+      \hat{\mu_1} \\
+      \hat{\mu_2} \\
+      \hat{\sigma_1^2} \\
+      \hat{\sigma_2^2}
+    \end{bmatrix} = \hat{\theta} \\
+  \end{aligned}
+\end{equation*}
+\end{enumerate}
+
+
 
 \begin{enumerate}[(a)]
-    \item $f(v_t,\theta) = $
-    \[
-\begin{bmatrix}
-    R_{t1}-\mu_1 \\
-    R_{t2}-\mu_2\\
-    (R_{t1}-\mu_1)^2-\sigma_1^2 \\
-    (R_{t2}-\mu_2)^2-\sigma_2^2 \\
-\end{bmatrix}
-\]
-$\theta = $
- \[
-\begin{bmatrix}
-    \mu_1 \\
-    \mu_2\\
-    \sigma_1^2 \\
-    \sigma_2^2 \\
-\end{bmatrix}
-\]
-$\frac{\partial f}{\partial \theta'}$
- \[
-\begin{bmatrix}
-    -1&0&0&0 \\
-    0&-1&0&0\\
-    -2(R_{t1}-\mu_1)&0&-1&0 \\
-    0&-2(R_{t2}-\mu_2)&0&-1 \\
-\end{bmatrix}
-\]
-$\hat{D_T}=\frac{1}{T}\sum \frac{\partial f}{\partial \theta '}=$
- \[
-\begin{bmatrix}
-    -1&0&0&0 \\
-    0&-1&0&0\\
-    0&0&-1&0 \\
-    0&0&0&-1 \\
-\end{bmatrix}
-\]
-$A_T=I$\\
-$A_T g_T(\theta)=0$\\
-$g_T(\theta) =0 =$
- \[
-\begin{bmatrix}
-    \frac{\sum R_{t1}}{T} - \mu_1 \\
-    \frac{\sum R_{t2}}{T} - \mu_2\\
-     \frac{\sum (R_{t1} - \mu_1)^2 }{T}- \sigma_1^2 \\
-    \frac{\sum (R_{t2}- \mu_2)^2}{T}  - \sigma_2^2\\
-\end{bmatrix}
-\]
-therefore, \\
-$\hat{\mu_1} = \frac{\sum R_{t1}}{T}$
-$\hat{\mu_2} = \frac{\sum R_{t2}}{T}$
-$\hat{\sigma_1^2}=\frac{\sum (R_{t1}-\hat{\mu_1})^2}{T}$
-$\hat{\sigma_2^2}=\frac{\sum (R_{t2}-\hat{\mu_2})^2}{T}$
+%     \item $f(v_t,\theta) = $
+%     \[
+% \begin{bmatrix}
+%     R_{t1}-\mu_1 \\
+%     R_{t2}-\mu_2\\
+%     (R_{t1}-\mu_1)^2-\sigma_1^2 \\
+%     (R_{t2}-\mu_2)^2-\sigma_2^2 \\
+% \end{bmatrix}
+% \]
+% $\theta = $
+%  \[
+% \begin{bmatrix}
+%     \mu_1 \\
+%     \mu_2\\
+%     \sigma_1^2 \\
+%     \sigma_2^2 \\
+% \end{bmatrix}
+% \]
+% $\frac{\partial f}{\partial \theta'}$
+%  \[
+% \begin{bmatrix}
+%     -1&0&0&0 \\
+%     0&-1&0&0\\
+%     -2(R_{t1}-\mu_1)&0&-1&0 \\
+%     0&-2(R_{t2}-\mu_2)&0&-1 \\
+% \end{bmatrix}
+% \]
+% $\hat{D_T}=\frac{1}{T}\sum \frac{\partial f}{\partial \theta '}=$
+%  \[
+% \begin{bmatrix}
+%     -1&0&0&0 \\
+%     0&-1&0&0\\
+%     0&0&-1&0 \\
+%     0&0&0&-1 \\
+% \end{bmatrix}
+% \]
+% $A_T=I$\\
+% $A_T g_T(\theta)=0$\\
+% $g_T(\theta) =0 =$
+%  \[
+% \begin{bmatrix}
+%     \frac{\sum R_{t1}}{T} - \mu_1 \\
+%     \frac{\sum R_{t2}}{T} - \mu_2\\
+%      \frac{\sum (R_{t1} - \mu_1)^2 }{T}- \sigma_1^2 \\
+%     \frac{\sum (R_{t2}- \mu_2)^2}{T}  - \sigma_2^2\\
+% \end{bmatrix}
+% \]
+% therefore, \\
+% $\hat{\mu_1} = \frac{\sum R_{t1}}{T}$
+% $\hat{\mu_2} = \frac{\sum R_{t2}}{T}$
+% $\hat{\sigma_1^2}=\frac{\sum (R_{t1}-\hat{\mu_1})^2}{T}$
+% $\hat{\sigma_2^2}=\frac{\sum (R_{t2}-\hat{\mu_2})^2}{T}$
 
 \item 
 $f(v,\theta) f(v,\theta)'=$
