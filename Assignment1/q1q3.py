@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import ttest_ind
 from scipy.stats import t
 import statsmodels.api as sm
+from scipy.linalg import cholesky
 #%%
 #set seed 
 np.random.seed(123)
@@ -106,8 +107,7 @@ np.random.seed(123)
 alpha = 0
 beta = 0.2
 theta = 0
-phi = 0.9 
-rho = 0.98
+phi = 0.98 
 sigma_u = 0.05
 sigma_v = 0.003
 corr_uv = -0.98
@@ -122,14 +122,27 @@ def simulate_and_estimate():
 
     for rep in range(n_replications):
         # Simulate data
-        u = np.random.normal(0, sigma_u, n_obs)
-        v = np.random.normal(0, sigma_v, n_obs)
+        corr_mat= np.array([[1.0, corr_uv],
+                        [corr_uv, 1.0]])
+
+        # Compute the (upper) Cholesky decomposition matrix
+        upper_chol = cholesky(corr_mat)
+
+            # Generate 3 series of normally distributed (Gaussian) numbers
+        rnd = np.random.normal(0.0, 1.0, size=(n_obs, 2))
+
+            # Finally, compute the inner product of upper_chol and rnd
+        errors = rnd @ upper_chol
+        u, v = errors[:, 0], errors[:, 1]
+            # Scale errors
+        u *= sigma_u
+        v *= sigma_v 
         x = np.zeros(n_obs)
         r = np.zeros(n_obs)
 
         for t in range(1, n_obs):
             x[t] = theta + phi * x[t-1] + v[t]
-            r[t] = alpha + beta * x[t] + u[t]
+            r[t] = alpha + beta * x[t-1] + u[t]
 
         # Estimate parameters with OLS
         model1 = sm.OLS(r, x)
@@ -170,8 +183,7 @@ np.random.seed(123)
 alpha = 0
 beta = 0.2
 theta = 0
-phi = 0.9 
-rho = 0.98
+phi = 0.98
 sigma_u = 0.05
 sigma_v = 0.003
 corr_uv = -0.98
@@ -186,8 +198,21 @@ def simulate_and_estimate():
 
     for rep in range(n_replications):
         # Simulate data
-        u = np.random.normal(0, sigma_u, n_obs)
-        v = np.random.normal(0, sigma_v, n_obs)
+        corr_mat= np.array([[1.0, corr_uv],
+                        [corr_uv, 1.0]])
+
+        # Compute the (upper) Cholesky decomposition matrix
+        upper_chol = cholesky(corr_mat)
+
+            # Generate 3 series of normally distributed (Gaussian) numbers
+        rnd = np.random.normal(0.0, 1.0, size=(n_obs, 2))
+
+            # Finally, compute the inner product of upper_chol and rnd
+        errors = rnd @ upper_chol
+        u, v = errors[:, 0], errors[:, 1]
+            # Scale errors
+        u *= sigma_u
+        v *= sigma_v 
         x = np.zeros(n_obs)
         r = np.zeros(n_obs)
 
@@ -231,20 +256,34 @@ np.random.seed(123)
 alpha = 0
 beta = 0
 theta = 0
-phi = 0
-rho = 0.98
+phi = 0.98
 sigma_u = 0.05
 sigma_v = 0.003
-sigma_uv = -0.98
+corr_uv = -0.98
 num_simulations = 10000  # Number of Monte Carlo simulations
 sample_size = 840 # Sample size for each simulation
 horizon = 12            # Horizon for long-horizon predictability regression
 significance_level = 0.05
 reject_count = 0
+
+
 for _ in range(num_simulations):
     # Simulate the system
-    u = np.random.normal(0, sigma_u, sample_size)
-    v = np.random.normal(0, sigma_v, sample_size)
+    corr_mat= np.array([[1.0, corr_uv],
+                        [corr_uv, 1.0]])
+
+    # Compute the (upper) Cholesky decomposition matrix
+    upper_chol = cholesky(corr_mat)
+
+        # Generate 3 series of normally distributed (Gaussian) numbers
+    rnd = np.random.normal(0.0, 1.0, size=(sample_size, 2))
+
+        # Finally, compute the inner product of upper_chol and rnd
+    errors = rnd @ upper_chol
+    u, v = errors[:, 0], errors[:, 1]
+        # Scale errors
+    u *= sigma_u
+    v *= sigma_v 
     x = np.zeros(sample_size)
     r = np.zeros(sample_size)
 
@@ -257,14 +296,14 @@ for _ in range(num_simulations):
     for t in range(sample_size - horizon + 1):
         rt_t_12[t] = np.sum(r[t:t + horizon])
     
-
-    model = sm.OLS(rt_t_12, x[horizon - 1:])
+    X = sm.add_constant(x[horizon - 1:])
+    model = sm.OLS(rt_t_12, X)
 
 
     results = model.fit()
 
     # Test the null hypothesis H0: betaK = 0
-    p_value = results.pvalues
+    p_value = results.pvalues[1]
 
     if p_value < significance_level:
         reject_count += 1
@@ -272,28 +311,38 @@ for _ in range(num_simulations):
 # Print the rejection rate
 rejection_rate = reject_count / num_simulations
 print(f'Rejection rate at {significance_level * 100}% significance level: {rejection_rate * 100}%')
-#475 out of 10,000 are rejected, meaning that the null hypothesis is rejected at 4.75% significance level.
+
+
 # %%
 #(c)use the Newey and West (1987) standard errors of βˆK with a maximum lag at 11 when testing H0
+#set seed
 np.random.seed(123)
 # Parameters
 alpha = 0
 beta = 0
 theta = 0
-phi = 0
-rho = 0.98
+phi = 0.98
 sigma_u = 0.05
 sigma_v = 0.003
-sigma_uv = -0.98
+sigma_uv = -0.98*sigma_u*sigma_v
+corr_uv = -0.98
 num_simulations = 10000  # Number of Monte Carlo simulations
 sample_size = 840 # Sample size for each simulation
 horizon = 12            # Horizon for long-horizon predictability regression
 significance_level = 0.05
 reject_count = 0
 for _ in range(num_simulations):
-    # Simulate the system
-    u = np.random.normal(0, sigma_u, sample_size)
-    v = np.random.normal(0, sigma_v, sample_size)
+    #Covariance matrix
+    cov_matrix = np.array([[sigma_u**2, sigma_uv], [sigma_uv, sigma_v**2]])
+
+    # Cholesky decomposition
+    L = np.linalg.cholesky(cov_matrix)
+
+    # Generate independent standard normal variables
+    z = np.random.normal(size=(2, sample_size))
+
+    # Transform to correlated variables with means
+    u, v = np.dot(L, z)
     x = np.zeros(sample_size)
     r = np.zeros(sample_size)
 
@@ -301,18 +350,18 @@ for _ in range(num_simulations):
         x[t + 1] = theta + phi * x[t] + v[t + 1]
         r[t + 1] = alpha + beta * x[t] + u[t + 1]
     
-    rt_t_12 = np.zeros(sample_size - horizon + 1)  # Assuming the length should be sample_size - horizon + 1
-
+    rt_t_12 = np.zeros(sample_size - horizon + 1) 
+    
     for t in range(sample_size - horizon + 1):
         rt_t_12[t] = np.sum(r[t:t + horizon])
     
-
-    model = sm.OLS(rt_t_12, x[horizon - 1:])
+    X = sm.add_constant(x[:sample_size - horizon + 1])
+    model = sm.OLS(rt_t_12, X)
     results = model.fit(cov_type='HAC', cov_kwds={'maxlags': 11})
 
 
     # Test the null hypothesis H0: betaK = 0
-    p_value = results.pvalues
+    p_value = results.pvalues[1]
 
     if p_value < significance_level:
         reject_count += 1
@@ -320,6 +369,20 @@ for _ in range(num_simulations):
 # Print the rejection rate
 rejection_rate = reject_count / num_simulations
 print(f'Rejection rate at {significance_level * 100}% significance level: {rejection_rate * 100}%')
-#512 out of 10,000 are rejected, meaning that the null hypothesis is rejected at 5.12% significance level.
 
-# %%
+
+ corr_mat= np.array([[1.0, corr_uv],
+                        [corr_uv, 1.0]])
+
+    # Compute the (upper) Cholesky decomposition matrix
+    upper_chol = cholesky(corr_mat)
+
+        # Generate 3 series of normally distributed (Gaussian) numbers
+    rnd = np.random.normal(0.0, 1.0, size=(sample_size, 2))
+
+        # Finally, compute the inner product of upper_chol and rnd
+    errors = rnd @ upper_chol
+    u, v = errors[:, 0], errors[:, 1]
+        # Scale errors
+    u *= sigma_u
+    v *= sigma_v 
