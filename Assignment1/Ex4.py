@@ -133,7 +133,28 @@ weights = prediction_data[['Month','omega_hat_BM','omega_hat_DP','omega_hat_OLS'
 weights = weights.dropna()
 weights['Month'] = weights['Month'].astype(str)
 weights = weights.set_index('Month')
-weights.plot()
+plt.figure(figsize=(10,5))
+plt.subplot(1, 2, 1)
+plt.plot(weights[['omega_hat_BM','omega_hat_DP']],linewidth=1.5)
+plt.legend(['BM','DP'])
+ticket_values = list(range(0,len(portfolio),24))
+ticket_values.append(len(portfolio))
+plt.xticks(ticket_values,rotation=45)
+plt.ylabel("Weights")
+plt.title("Weights of BM and DP")
+plt.xlabel("Year-Month")
+plt.subplot(1, 2, 2)
+plt.plot(weights[['omega_hat_OLS','omega_hat_CM']],linewidth=1.5)
+plt.legend(['OLS','CM'])
+ticket_values = list(range(0,len(portfolio),24))
+ticket_values.append(len(portfolio))
+plt.xticks(ticket_values,rotation=45)
+plt.title("Weights of OLS and CM")
+plt.xlabel("Year-Month")
+plt.savefig("Out/Ex4_D.png",dpi=300,bbox_inches='tight')
+plt.savefig("Out/Ex4_D.pdf",dpi=300,bbox_inches='tight')
+
+
 # %% (e) Investor's utility
 def utility(r,sigma, gamma):
     return r - 0.5*gamma*sigma**2

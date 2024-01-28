@@ -144,6 +144,50 @@
         \centering
         \includegraphics[width=0.85\textwidth]{Out/Ex4_C.pdf}
         \caption{Cumulative returns of the portfolios}
-        \label{fig:my_label}
     \end{figure}
+
+    \begin{lstlisting}[language=Python, caption=Python code for portfolio weights, label={lst:q1a}, escapechar=|, frame=single, basicstyle=\small, showstringspaces=false, captionpos=b, breaklines=true, showspaces=false, showtabs=false, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+    prediction_data['rolling_var'] = prediction_data.ExcessRet.rolling(60).var()
+    gamma = 2
+    for prediction_model in ['BM',"DP", "OLS", "CM"]:
+        prediction_data['omega_hat'] = prediction_data[prediction_model]/prediction_data['rolling_var']/gamma
+        prediction_data['omega_hat_'+prediction_model] = prediction_data['omega_hat']
+        prediction_data.loc[prediction_data.omega_hat >= 2,'omega_hat_'+prediction_model] = 2
+        prediction_data.loc[prediction_data.omega_hat <= -1,'omega_hat_'+prediction_model] = -1
+        prediction_data['r_p_'+prediction_model] = prediction_data['ExcessRet'] + prediction_data['omega_hat_'+prediction_model]*prediction_data['ExcessRet']
+    \end{lstlisting}
+
+    \item Now we want to plot the optimal weights of the portfolios. The optimal weights are calculated as mentioned before. The optimal weights of the portfolios are shown in following Figure. We can see that the optimal weights of the portfolios based on the OLS and CM models are not stable and they change over time. However, the optimal weights of the portfolio based on the BM and DP  are stable and they do not change over time. It is interesting to see that the weights from the DP model and the BM model are highly correlated. 
+    \begin{figure}[htbp!]
+        \centering
+        \includegraphics[width=0.85\textwidth]{Out/Ex4_D.pdf}
+        \caption{Optimal weights of the portfolios}
+    \end{figure}
+
+    \item Now we define a utility function for the investor as:
+    \begin{equation*}
+        U(\hat{R}_{p,t}^j) = \hat{E}\left[\hat{R}_{p,t}^j\right] - \frac{\gamma}{2} \hat{Var}\left(\hat{R}_{p,t}^j\right)
+    \end{equation*}
+    and we want to compare the utility of the portfolios based on the predicted excess returns of each model with the utility of the benchmark which is the historical mean. The utility gain is defined as:
+    \begin{equation*}
+        UG = U(\hat{R}_{p,t}^j) - U(\hat{R}_{p,t}^{BM})
+    \end{equation*}
+    
+    The utility gain for each model is shown in the following table. We can see that the utility gain for the DP model is negative which means that the utility of the portfolio based on the DP model is less than the utility of the benchmark. However, the utility gain for the OLS and CM models are positive which means that the utility of the portfolios based on these models are higher than the utility of the benchmark.
+
+    In this comparison,  we can see that the utility gain for the CM model is the highest which means that the portfolio based on the CM model is the best portfolio among the other portfolios.
+
+    \begin{table}[htbp]
+        \centering
+        \begin{tabular}{c|c}
+            Model & $UG$ \\
+            \hline
+            DP & -0.003 \\
+            OLS & 0.0013 \\
+            CM & 0.0043 \\
+        \end{tabular}
+        \caption{Utility gain for each model}
+    \end{table}
+
+
 \end{enumerate}
