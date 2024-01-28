@@ -17,8 +17,8 @@
         \includegraphics[width=0.9\linewidth]{Out/EX3-2.pdf}
         
     \end{figure}
-Compared with the estimation with n=840, the estimation with n=240 is more biased, it's more skewed to the right side and away from the true value.
-
+Compared with the estimation with n=840, the estimation with n=240 is more biased and away from the true value.
+This is probably because the sample size is too small to estimate the true value.
 
 
 \begin{lstlisting}[language=Python, caption=Python code for simulation, label={lst:q1a}, escapechar=|, frame=single, basicstyle=\small, showstringspaces=false, captionpos=b, breaklines=true, showspaces=false, showtabs=false, keywordstyle=\color{blue}, commentstyle=\color{gray}]
@@ -76,9 +76,9 @@ def estimate_parameters(r, x):
     return beta_hat, phi_hat
 \end{lstlisting}
 \item 
-We rejected 0 times out of 10,000 when when assuming IID errors, 
+At the confidence level of 5\%, we rejected 50.51\% of 10,000 simulations when when assuming IID errors, 
 suggesting that we reject the null hypothesis. 
-However, we should be expecting high rejection rate since the real value of beta is 0.\\
+However, we should be expecting lower rejection rate since the real value of beta is 0.\\
 This difference might be due to the fact that the errors are not independent.\\
  \textcolor{red}{New results [0.5051, 0.3815, 0.2619] for significance level 5\%, 1\%, 0.1\% respectively}
 
@@ -97,8 +97,8 @@ def new_simulation():
     \end{lstlisting}
 
 \item 
-We rejected 9.77\% of the simulations out of 10,000 runs when using Newey-West standard errors, suggesting that there is autocorrelation present in the errors, and the standard errors are adjusted to account for this.\\
-At the 10\% significant level, we would not reject the null hypothesis: H0: beta=0. 
+We rejected 9.13\% of the simulations out of 10,000 runs when using Newey-West standard errors, suggesting that there is autocorrelation present in the errors, and the standard errors are adjusted to account for this.\\
+At the 5\% significant level, we would not reject the null hypothesis: H0: beta=0. 
 \textcolor{red}{New results : [0.0913, 0.0326, 0.0067] for significance level 5\%, 1\%, 0.1\% respectively}
 
 \begin{lstlisting}[language=Python, caption=Python code for new model with Newey-West, label={lst:q1a}, escapechar=|, frame=single, basicstyle=\small, showstringspaces=false, captionpos=b, breaklines=true, showspaces=false, showtabs=false, keywordstyle=\color{blue}, commentstyle=\color{gray}]

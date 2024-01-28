@@ -134,8 +134,10 @@ def new_simulation_neweywest():
     pvalue = np.zeros(n_replications)
     for rep in range(n_replications):
         r, x = generate_data()
-        pvalue[rep] = estimate_new_model(r,x)
+        pvalue[rep] = estimate_new_model_neweywest(r,x)
     return pvalue
 np.random.seed(123)
 pvalue = new_simulation_neweywest()
 [np.mean(pvalue<0.05),np.mean(pvalue<0.01),np.mean(pvalue<0.001)]
+
+# %%
