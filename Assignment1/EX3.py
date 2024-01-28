@@ -110,110 +110,32 @@ plot_histograms(beta_hat_sim, phi_hat_sim,'EX3-2')
 # %% (b)
 beta = 0
 n_obs = 840
-# np.random.seed(123)
-r, x = generate_data()
-
-df = pd.DataFrame({'r':r,'x':x})
-df['12_month_return'] = df['r'].rolling(12).sum()
-# get the pvalue of the regression
-sm.OLS(df['12_month_return'][11:], sm.add_constant(df['x'][11:])).fit().summary()
-# %%
-#(b)
+def estimate_new_model(r,x):
+    df = pd.DataFrame({'r':r,'x':x})
+    df['12_month_return'] = df['r'].rolling(12).sum()
+    # get the pvalue of the regression
+    return sm.OLS(df['12_month_return'][11:], sm.add_constant(df['x'][11:])).fit().pvalues[1]
+def new_simulation():
+    pvalue = np.zeros(n_replications)
+    for rep in range(n_replications):
+        r, x = generate_data()
+        pvalue[rep] = estimate_new_model(r,x)
+    return pvalue
 np.random.seed(123)
-# Parameters
-alpha = 0
-beta = 0
-theta = 0
-phi = 0
-rho = 0.98
-sigma_u = 0.05
-sigma_v = 0.003
-sigma_uv = -0.98
-num_simulations = 10000  # Number of Monte Carlo simulations
-sample_size = 840 # Sample size for each simulation
-horizon = 12            # Horizon for long-horizon predictability regression
-significance_level = 0.05
-reject_count = 0
-for _ in range(num_simulations):
-    # Simulate the system
-
-    u = np.random.normal(0, sigma_u, sample_size)
-    v = np.random.normal(0, sigma_v, sample_size)
-    x = np.zeros(sample_size)
-    r = np.zeros(sample_size)
-
-    for t in range(sample_size - 1):
-        x[t + 1] = theta + phi * x[t] + v[t + 1]
-        r[t + 1] = alpha + beta * x[t] + u[t + 1]
-    
-    rt_t_12 = np.zeros(sample_size - horizon + 1)  # Assuming the length should be sample_size - horizon + 1
-
-    for t in range(sample_size - horizon + 1):
-        rt_t_12[t] = np.sum(r[t:t + horizon])
-    
-
-    model = sm.OLS(rt_t_12, x[horizon - 1:])
-
-
-    results = model.fit()
-
-    # Test the null hypothesis H0: betaK = 0
-    p_value = results.pvalues
-
-    if p_value < significance_level:
-        reject_count += 1
-
-# Print the rejection rate
-rejection_rate = reject_count / num_simulations
-print(f'Rejection rate at {significance_level * 100}% significance level: {rejection_rate * 100}%')
-#475 out of 10,000 are rejected, meaning that the null hypothesis is rejected at 4.75% significance level.
-# %%
-#(c)use the Newey and West (1987) standard errors of βˆK with a maximum lag at 11 when testing H0
+pvalue = new_simulation()
+[np.mean(pvalue<0.05),np.mean(pvalue<0.01),np.mean(pvalue<0.001)]
+#%% (c)
+def estimate_new_model(r,x):
+    df = pd.DataFrame({'r':r,'x':x})
+    df['12_month_return'] = df['r'].rolling(12).sum()
+    # get the pvalue of the regression
+    return sm.OLS(df['12_month_return'][11:], sm.add_constant(df['x'][11:])).fit(cov_type='HAC', cov_kwds={'maxlags': 11}).pvalues[1]
+def new_simulation():
+    pvalue = np.zeros(n_replications)
+    for rep in range(n_replications):
+        r, x = generate_data()
+        pvalue[rep] = estimate_new_model(r,x)
+    return pvalue
 np.random.seed(123)
-# Parameters
-alpha = 0
-beta = 0
-theta = 0
-phi = 0
-rho = 0.98
-sigma_u = 0.05
-sigma_v = 0.003
-sigma_uv = -0.98
-num_simulations = 10000  # Number of Monte Carlo simulations
-sample_size = 840 # Sample size for each simulation
-horizon = 12            # Horizon for long-horizon predictability regression
-significance_level = 0.05
-reject_count = 0
-for _ in range(num_simulations):
-    # Simulate the system
-    u = np.random.normal(0, sigma_u, sample_size)
-    v = np.random.normal(0, sigma_v, sample_size)
-    x = np.zeros(sample_size)
-    r = np.zeros(sample_size)
-
-    for t in range(sample_size - 1):
-        x[t + 1] = theta + phi * x[t] + v[t + 1]
-        r[t + 1] = alpha + beta * x[t] + u[t + 1]
-    
-    rt_t_12 = np.zeros(sample_size - horizon + 1)  # Assuming the length should be sample_size - horizon + 1
-
-    for t in range(sample_size - horizon + 1):
-        rt_t_12[t] = np.sum(r[t:t + horizon])
-    
-
-    model = sm.OLS(rt_t_12, x[horizon - 1:])
-    results = model.fit(cov_type='HAC', cov_kwds={'maxlags': 11})
-
-
-    # Test the null hypothesis H0: betaK = 0
-    p_value = results.pvalues
-
-    if p_value < significance_level:
-        reject_count += 1
-
-# Print the rejection rate
-rejection_rate = reject_count / num_simulations
-print(f'Rejection rate at {significance_level * 100}% significance level: {rejection_rate * 100}%')
-#512 out of 10,000 are rejected, meaning that the null hypothesis is rejected at 5.12% significance level.
-
-# %%
+pvalue = new_simulation()
+[np.mean(pvalue<0.05),np.mean(pvalue<0.01),np.mean(pvalue<0.001)]
