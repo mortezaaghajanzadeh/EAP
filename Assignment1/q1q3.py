@@ -160,7 +160,7 @@ plt.xlabel('Phi')
 
 plt.tight_layout()
 plt.show()
-# %%
+
 # %%
 #question 3 with 240 observations
 # Set random seed for reproducibility
@@ -226,47 +226,100 @@ plt.tight_layout()
 plt.show()
 # %%
 #(b)
-# Simulate data
 np.random.seed(123)
-n_obs = 840
+# Parameters
+alpha = 0
 beta = 0
+theta = 0
+phi = 0
+rho = 0.98
+sigma_u = 0.05
+sigma_v = 0.003
+sigma_uv = -0.98
+num_simulations = 10000  # Number of Monte Carlo simulations
+sample_size = 840 # Sample size for each simulation
+horizon = 12            # Horizon for long-horizon predictability regression
+significance_level = 0.05
+reject_count = 0
+for _ in range(num_simulations):
+    # Simulate the system
+    u = np.random.normal(0, sigma_u, sample_size)
+    v = np.random.normal(0, sigma_v, sample_size)
+    x = np.zeros(sample_size)
+    r = np.zeros(sample_size)
 
-x = np.zeros(n_obs)
-u = np.random.normal(0, 0.1, size=n_obs)
+    for t in range(sample_size - 1):
+        x[t + 1] = theta + phi * x[t] + v[t + 1]
+        r[t + 1] = alpha + beta * x[t] + u[t + 1]
+    
+    rt_t_12 = np.zeros(sample_size - horizon + 1)  # Assuming the length should be sample_size - horizon + 1
 
-for t in range(1, n_obs):
-    x[t] = beta * x[t-1] + u[t]
+    for t in range(sample_size - horizon + 1):
+        rt_t_12[t] = np.sum(r[t:t + horizon])
+    
 
-# Create 12-month log-return series
-log_returns = np.log(x[12:] / x[:-12])
+    model = sm.OLS(rt_t_12, x[horizon - 1:])
 
-# Create lagged variable
-x_lagged = x[:-12]
 
-# Add a constant term to the independent variable for the intercept
-X = sm.add_constant(x_lagged)
+    results = model.fit()
 
-# Dependent variable
-y = log_returns
+    # Test the null hypothesis H0: betaK = 0
+    p_value = results.pvalues
 
-# Fit OLS model
-model = sm.OLS(y, X)
-results = model.fit()
+    if p_value < significance_level:
+        reject_count += 1
 
-# Print summary statistics
-print(results.summary())
+# Print the rejection rate
+rejection_rate = reject_count / num_simulations
+print(f'Rejection rate at {significance_level * 100}% significance level: {rejection_rate * 100}%')
+#475 out of 10,000 are rejected, meaning that the null hypothesis is rejected at 4.75% significance level.
+# %%
+#(c)use the Newey and West (1987) standard errors of βˆK with a maximum lag at 11 when testing H0
+np.random.seed(123)
+# Parameters
+alpha = 0
+beta = 0
+theta = 0
+phi = 0
+rho = 0.98
+sigma_u = 0.05
+sigma_v = 0.003
+sigma_uv = -0.98
+num_simulations = 10000  # Number of Monte Carlo simulations
+sample_size = 840 # Sample size for each simulation
+horizon = 12            # Horizon for long-horizon predictability regression
+significance_level = 0.05
+reject_count = 0
+for _ in range(num_simulations):
+    # Simulate the system
+    u = np.random.normal(0, sigma_u, sample_size)
+    v = np.random.normal(0, sigma_v, sample_size)
+    x = np.zeros(sample_size)
+    r = np.zeros(sample_size)
 
-# Hypothesis testing: H0: beta_K = 0
-t_stat = results.tvalues[1]  # t-statistic for the coefficient beta_K
-p_value = results.pvalues[1]  # p-value for the coefficient beta_K
+    for t in range(sample_size - 1):
+        x[t + 1] = theta + phi * x[t] + v[t + 1]
+        r[t + 1] = alpha + beta * x[t] + u[t + 1]
+    
+    rt_t_12 = np.zeros(sample_size - horizon + 1)  # Assuming the length should be sample_size - horizon + 1
 
-print("t-statistic:", t_stat)
-print("p-value:", p_value)
+    for t in range(sample_size - horizon + 1):
+        rt_t_12[t] = np.sum(r[t:t + horizon])
+    
 
-# Check for significance at a 5% level
-alpha = 0.05
-if p_value < alpha:
-    print('Reject the null hypothesis: beta_K is significantly different from 0.')
-else:
-    print('Fail to reject the null hypothesis: No significant evidence against beta_K = 0.')
+    model = sm.OLS(rt_t_12, x[horizon - 1:])
+    results = model.fit(cov_type='HAC', cov_kwds={'maxlags': 11})
+
+
+    # Test the null hypothesis H0: betaK = 0
+    p_value = results.pvalues
+
+    if p_value < significance_level:
+        reject_count += 1
+
+# Print the rejection rate
+rejection_rate = reject_count / num_simulations
+print(f'Rejection rate at {significance_level * 100}% significance level: {rejection_rate * 100}%')
+#512 out of 10,000 are rejected, meaning that the null hypothesis is rejected at 5.12% significance level.
+
 # %%
