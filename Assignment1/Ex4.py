@@ -4,6 +4,8 @@ import pandas as pd
 import statsmodels.api as sm
 from tqdm import tqdm
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 #%%
 data = pd.read_excel("Assignment1Data_G1.xlsx", sheet_name="Predictability")
 data = data.dropna()
@@ -16,7 +18,7 @@ years = range(1970,2018)
 periods = [int(str(i) + "0" + str(j)) for i in years for j in range(1,10) if len(str(j)) == 1]
 periods.extend([int(str(i) + str(j)) for i in years for j in range(10,13) if len(str(j)) == 2 ])
 periods.sort()
-# %% DP estimation
+# %% Estimation
 def prediction(X,y):
     beta = sm.OLS(y,X).fit().params.to_numpy()
     return X.iloc[-1].to_numpy() @ beta
@@ -108,11 +110,21 @@ prediction_data.to_excel("Out/prediction_data.xlsx",index=False)
 portfolio = pd.DataFrame()
 portfolio = prediction_data[['Month','r_p_BM','r_p_DP','r_p_OLS','r_p_CM']].copy()
 portfolio = portfolio.dropna()
-portfolio += 1
 portfolio['Month'] = portfolio['Month'].astype(str)
 portfolio = portfolio.set_index('Month')
+portfolio += 1
 portfolio = portfolio.cumprod()
-portfolio.plot()
+plt.figure(figsize=(10,5))
+plt.plot(portfolio,linewidth=1.5)
+plt.legend(['BM','DP','OLS','CM'])
+ticket_values = list(range(0,len(portfolio),12))
+ticket_values.append(len(portfolio))
+plt.xticks(ticket_values,rotation=45)
+plt.ylabel("Cumulative Return")
+plt.title("Cumulative Return of the Portfolios based on Different Prediction Models")
+plt.xlabel("Year-Month")
+plt.show()
+
 # %% (d) plot the weights
 weights = pd.DataFrame()
 weights = prediction_data[['Month','omega_hat_BM','omega_hat_DP','omega_hat_OLS','omega_hat_CM']].copy()
