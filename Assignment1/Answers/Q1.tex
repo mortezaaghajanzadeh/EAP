@@ -90,13 +90,192 @@ Our calculated $\hat{\theta}$ based on the given data is:
       (R_{t1} - \mu_1)^3 - \sigma_1^2(R_{t1} - \mu_1) & (R_{t1} - \mu_1)^2(R_{t2} - \mu_2) - \sigma_1^2(R_{t2} - \mu_2) & (R_{t1} - \mu_1)^4 - 2\sigma_1^2(R_{t1} - \mu_1)^2 + \sigma_1^4 & (R_{t1} - \mu_1)^2(R_{t2} - \mu_2)^2 - \sigma_1^2(R_{t1} - \mu_1)\sigma_2^2(R_{t2} - \mu_2)\\
       (R_{t1} - \mu_1)(R_{t2} - \mu_2)^2 - \sigma_2^2(R_{t1} - \mu_1) & (R_{t2} - \mu_2)^3 - \sigma_2^2(R_{t2} - \mu_2) & (R_{t1} - \mu_1)^2(R_{t2} - \mu_2)^2 - \sigma_1^2(R_{t1} - \mu_1)\sigma_2^2(R_{t2} - \mu_2) & (R_{t2} - \mu_2)^4 - 2\sigma_2^2(R_{t2} - \mu_2)^2 + \sigma_2^4\\
     \end{bmatrix}} \\
+    & = {\begin{bmatrix}
+      \hat{\sigma_1}^2 & Cov(\hat{R_1},\hat{R_2}) & \hat{m}_1^{(3)} & \hat{k}_{12}^{(2)}\\
+      Cov(\hat{R_1},\hat{R_2}) & \hat{\sigma_2}^2 & \hat{k}_{21}^{(2)} & \hat{m}_2^{(3)}\\
+      \hat{m}_1^{(3)} & \hat{k}_{12}^{(2)} & \hat{m}_1^{(4)} - \hat{\sigma}_1^4 & \hat{k}_{12}^{(3)}\\
+      \hat{k}_{21}^{(2)} & \hat{m}_2^{(3)} & \hat{k}_{12}^{(3)} & \hat{m}_2^{(4)} - \hat{\sigma}_2^4\\
+      \end{bmatrix}} \\
+  \end{aligned}
+\end{equation*}
+Here the definition of $\hat{m}_1^{(j)}$ is the one in the lecture notes. For the $\hat{k}_{mn}^{(j)}$, I do not have a good way to write it in the matrix form. Therefore, I just write it as a way to sum up the terms in the matrix.\\
+
+As we know that two process are independent, and normally distributed, we can calculate the $\hat{S_T}$ as follows:
+\begin{equation*}
+  \begin{aligned}
+    \hat{S_T} = & \begin{bmatrix}
+      \hat{\sigma_1}^2 & 0 & 0 & 0\\
+      0 & \hat{\sigma_2}^2 & 0 & 0\\
+      0 & 0 & 2\hat{\sigma_1}^4 & 0 \\
+      0 & 0 & 0 & 2\hat{\sigma_2}^4 \\
+    \end{bmatrix} \\
   \end{aligned}
 \end{equation*}
 
+Our calculated $\hat{S_T}$ based on the given data is:
+\begin{equation*}
+  \hat{S_T} = \begin{bmatrix}
+    0.0212 & 0 & 0 & 0\\
+    0 & 0.0167 & 0 & 0\\
+    0 & 0 & 0.0347 & 0 \\
+    0 & 0 & 0 & 0.0011 \\
+  \end{bmatrix}
+\end{equation*}
+\begin{lstlisting}[language=Python, caption=Python function for calculating standard error of estimation , label={lst:q1a}, escapechar=|, frame=single, basicstyle=\small, showstringspaces=false, captionpos=b, breaklines=true, showspaces=false, showtabs=false, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+theta = np.array([mu_1,mu_2, sigma_1, sigma_2])
+def f_v(theta,x):
+    mu_1 = theta[0]
+    mu_2 = theta[1]
+    sigma_1 = theta[2]
+    sigma_2 = theta[3]
+    x_1 = x[0]
+    x_2 = x[1]
+    f = np.array([x_1-mu_1,x_2-mu_2,(x_1-mu_1)**2-sigma_1,(x_2-mu_2)**2-sigma_2]).reshape(len(theta),1)
+    return f
+def s(theta,x):
+    f = f_v(theta,x)
+    return f @ f.T
+x = np.array([df[['Stock1','Stock2']]])[0]
+s_hat = sum([s(theta,i) for i in x])/len(x)
+# set non-diagonal elements to zero
+s_hat = s_hat * np.eye(4)
+\end{lstlisting}
 
 
+
+\item Now we want to adjust the standard errors by Newey-West estimator. Therefore, we need to calculate the $\hat{\Gamma_1}$ by using the fact that two distributions are independent:
+\begin{equation*}
+  \begin{aligned}
+    \hat{\Gamma_1} = & \scalemath{0.6}{ \begin{bmatrix}
+      \frac{\sum^T_2 (R_{t}^1-\mu_1)(R_{t-1}^1-\mu_1)}{T-1} &0&  \frac{\sum^T_2 (R_{t}^1-\mu_1)(R_{t-1}^1-\mu_1)^2}{T-1} &0\\
+    0& \frac{\sum^T_2 (R_{t}^2-\mu_2)(R_{t-1}^2-\mu_2)}{T-1} &0 & \frac{\sum^T_2 (R_{t}^2-\mu_2)(R_{t-1}^2-\mu_2)^2}{T-1}\\
+    \frac{\sum^T_2 (R_{t-1}^1-\mu_1)(R_{t-1}^1-\mu_1)^2}{T-1} &0 &\frac{\sum^T_2 (R_{t-1}^1-\mu_1)^2(R_{t-1}^1-\mu_1)^2}{T-1}+\sigma_1^4 &0\\
+    0 & \frac{\sum^T_2 (R_{t-1}^2-\mu_2)(R_{t-1}^2-\mu_2)^2}{T-1} & 0 & \frac{\sum^T_2 (R_{t-1}^2-\mu_2)^2(R_{t-1}^2-\mu_2)^2}{T-1}+\sigma_2^4\\ 
+    \end{bmatrix}} 
+  \end{aligned}
+\end{equation*}
+and then we can calculate the $\hat{S_T}$ as follows:
+\begin{equation*}
+  \begin{aligned}
+    \hat{S_T} = & \begin{bmatrix}
+      \hat{\sigma_1}^2 & 0 & 0 &0 \\
+      0 & \hat{\sigma_2}^2 &0 &0 \\
+      0 & 0 & 2\hat{\sigma_1}^4 & 0 \\
+      0 & 0 & 0 & 2\hat{\sigma_2}^4 \\
+    \end{bmatrix}
+    + \frac{1}{2}(\hat{\Gamma}_1 + \hat{\Gamma}_1')\\
+  \end{aligned}
+\end{equation*}
+
+Our calculated $\hat{S_T}$ based on the given data is:
+\begin{equation*}
+  \hat{S_T} = \begin{bmatrix}
+    0.0162 & 0 & 0 & 0\\
+    0 & 0.0160 & 0 & 0\\
+    0 & 0 & 0.04 & 0 \\
+    0 & 0 & 0 & 0.0013 \\
+  \end{bmatrix}
+\end{equation*}
+
+\begin{lstlisting}[language=Python, caption=Python function for calculating Newy-West standard error , label={lst:q1a}, escapechar=|, frame=single, basicstyle=\small, showstringspaces=false, captionpos=b, breaklines=true, showspaces=false, showtabs=false, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+theta = np.array([mu_1,mu_2, sigma_1, sigma_2])
+lag = 1
+def gamma(theta,x,lag):
+    gamma = {}
+    for i in range(1,lag +1):
+        lag = np.array(df[['Stock1','Stock2']].shift(i).dropna())
+        tempt = []
+        for num,j in enumerate(x[i:]):
+            tempt.append(f_v(theta,j) @ f_v(theta,lag[num]).T)
+        gamma[i] = sum(tempt)/len(tempt)
+    gamma = [gamma[i] for i in gamma]
+    return sum(gamma)
+
+def s_newywest(theta,x):
+    gamma_hat = gamma(theta,x,lag)
+    return sum([s(theta,i) for i in x])/len(x) + 0.5 * (gamma_hat + gamma_hat.T)
+s_hat_newywest = s_newywest(theta,x)
+s_hat_newywest * np.eye(4)
+\end{lstlisting}
+
+\item  Now we want to compare the Sharpe ratio of two stocks. Therefore, we need to test the hypothesis that:
+\begin{equation*}
+  \begin{cases}
+    H_0: \frac{\mu_1}{\sigma_1} = \frac{\mu_2}{\sigma_2} \\
+    H_1: \frac{\mu_1}{\sigma_1} \neq \frac{\mu_2}{\sigma_2} \\
+  \end{cases} \Rightarrow \begin{cases}
+    H_0:  \mu_1\sigma_2 - \mu_2\sigma_1 = 0 \\
+    H_1:  \mu_1\sigma_2 - \mu_2\sigma_1 \neq 0 \\
+  \end{cases}
+\end{equation*}
+now we can define the $R(\theta)$ as follows:
+\begin{equation*}
+  \begin{aligned}
+    R(\theta) = & \mu_1\sigma_2 - \mu_2\sigma_1 \\
+  \end{aligned}
+\end{equation*}
+and then rewrite the hypothesis as follows:
+\begin{equation*}
+  \begin{aligned}
+    H_0: & R(\theta) = 0 \\
+    H_1: & R(\theta) \neq 0 \\
+  \end{aligned}
+\end{equation*}
+Now we can use the Delta method to find the distribution of $R(\hat{\theta})$:
+\begin{equation*}
+  \begin{aligned}
+    \sqrt{T}(R(\hat{\theta}) - R(\theta)) \xrightarrow{d} N(0,\frac{\partial R(\theta)}{\partial \theta'}V_{\theta}\frac{\partial R(\theta)}{\partial \theta'}) \\
+    \sqrt{T}(R(\hat{\theta})) \xrightarrow{d} N(0,\frac{\partial R(\theta)}{\partial \theta'}V_{\theta}\frac{\partial R(\theta)}{\partial \theta'}) \\
+  \end{aligned}
+\end{equation*}
+where $V_{\theta}$ is the variance of $\hat{\theta}$. Now we can calculate the $\frac{\partial R(\theta)}{\partial \theta'}$ as follows:
+\begin{equation*}
+  \begin{aligned}
+    \frac{\partial R(\theta)}{\partial \theta'} = & \begin{bmatrix}
+      \sigma_2 & -\sigma_1 & -\mu_2 & \mu_1
+    \end{bmatrix} \\
+  \end{aligned}
+\end{equation*}
+and we know that $V_{\theta} = \hat{S_T}$. Therefore, we can find the distribution of $R(\hat{\theta})$ as follows:
+\begin{equation*}
+\begin{aligned}
+  \frac{\partial R(\theta)}{\partial \theta'}V_{\theta}\frac{\partial R(\theta)}{\partial \theta'} = & \begin{bmatrix}
+    \sigma_2 & -\sigma_1 & -\mu_2 & \mu_1
+  \end{bmatrix} \hat{S_T} \begin{bmatrix}
+    \sigma_2 \\
+    -\sigma_1 \\
+    -\mu_2 \\
+    \mu_1
+  \end{bmatrix}  = \hat{V}_T
+\end{aligned}
+\end{equation*}
+
+Now we can calculate the test statistic as follows:
+\begin{equation*}
+  \begin{aligned}
+    T R(\hat{\theta})' \hat{V}_T^{-1} R(\hat{\theta}) \xrightarrow{d} \chi^2_1 \\
+    \frac{T(\mu_1\sigma_2 - \mu_2\sigma_1)^2}{\hat{S}_T} \xrightarrow{d} \chi^2_1 \\
+  \end{aligned}
+\end{equation*}
 \end{enumerate}
-
+Let's calculate the test statistic:
+\begin{equation*}
+  \begin{aligned}
+    \hat{V}_T = \begin{bmatrix}
+      0.0167 & -0.0212 & -0.0045 & 0.0162
+    \end{bmatrix} \begin{bmatrix}
+        0.0212 & 0 & 0 & 0\\
+        0 & 0.0167 & 0 & 0\\
+        0 & 0 & 0.0347 & 0 \\
+        0 & 0 & 0 & 0.0011 \\
+      \end{bmatrix} \begin{bmatrix}
+        0.0167 \\
+        -0.0212 \\
+        -0.0045 \\
+        0.0162
+      \end{bmatrix} = 0.001449 \\
+  \end{aligned}
+\end{equation*}
 
 \begin{enumerate}[(a)]
     \item $f(v_t,\theta) = $
@@ -153,72 +332,72 @@ Our calculated $\hat{\theta}$ based on the given data is:
 % $\hat{\sigma_2^2}=\frac{\sum (R_{t2}-\hat{\mu_2})^2}{T}$
 
 \item 
-$f(v,\theta) f(v,\theta)'=$
-\[
-\begin{bmatrix}
-  R_{t1}-\mu_1 \\
-    R_{t2}-\mu_2\\
-    (R_{t1}-\mu_1)^2-\sigma_1^2 \\
-    (R_{t2}-\mu_2)^2-\sigma_2^2 \\
-\end{bmatrix}
-\begin{bmatrix}
- R_{t1}-\mu_1 &
-    R_{t2}-\mu_2&
-    (R_{t1}-\mu_1)^2-\sigma_1^2 &
-    (R_{t2}-\mu_2)^2-\sigma_2^2 
-\end{bmatrix}
-\]
-given $R1 \sim N(\mu_1,\sigma_1^2)$ and $R2 \sim N(\mu_2,\sigma_2^2)$\\
+% $f(v,\theta) f(v,\theta)'=$
+% \[
+% \begin{bmatrix}
+%   R_{t1}-\mu_1 \\
+%     R_{t2}-\mu_2\\
+%     (R_{t1}-\mu_1)^2-\sigma_1^2 \\
+%     (R_{t2}-\mu_2)^2-\sigma_2^2 \\
+% \end{bmatrix}
+% \begin{bmatrix}
+%  R_{t1}-\mu_1 &
+%     R_{t2}-\mu_2&
+%     (R_{t1}-\mu_1)^2-\sigma_1^2 &
+%     (R_{t2}-\mu_2)^2-\sigma_2^2 
+% \end{bmatrix}
+% \]
+% given $R1 \sim N(\mu_1,\sigma_1^2)$ and $R2 \sim N(\mu_2,\sigma_2^2)$\\
 
-$\hat{S_T}=$
-\[
-\begin{bmatrix}
-  \hat{\sigma_1}^2 &0&0&0\\
-    0&\hat{\sigma_2}^2&0&0\\
-    0&0&2\hat{\sigma_1}^4&0 \\
-    0&0&0&2\hat{\sigma_2}^4 \\
-\end{bmatrix}
-\]
+% $\hat{S_T}=$
+% \[
+% \begin{bmatrix}
+%   \hat{\sigma_1}^2 &0&0&0\\
+%     0&\hat{\sigma_2}^2&0&0\\
+%     0&0&2\hat{\sigma_1}^4&0 \\
+%     0&0&0&2\hat{\sigma_2}^4 \\
+% \end{bmatrix}
+% \]
 
 \item 
-$f(v_t,\theta) f(v_{t-1},\theta)'=$
-\[
-\begin{bmatrix}
-  R_{t1}-\mu_1 \\
-    R_{t2}-\mu_2\\
-    (R_{t1}-\mu_1)^2-\sigma_1^2 \\
-    (R_{t2}-\mu_2)^2-\sigma_2^2 \\
-\end{bmatrix}
-\begin{bmatrix}
- R_{t1-1}-\mu_1 &
-    R_{t2-1}-\mu_2&
-    (R_{t1-1}-\mu_1)^2-\sigma_1^2 &
-    (R_{t2-1}-\mu_2)^2-\sigma_2^2 
-\end{bmatrix}
-\]
+% $f(v_t,\theta) f(v_{t-1},\theta)'=$
+% \[
+% \begin{bmatrix}
+%   R_{t1}-\mu_1 \\
+%     R_{t2}-\mu_2\\
+%     (R_{t1}-\mu_1)^2-\sigma_1^2 \\
+%     (R_{t2}-\mu_2)^2-\sigma_2^2 \\
+% \end{bmatrix}
+% \begin{bmatrix}
+%  R_{t1-1}-\mu_1 &
+%     R_{t2-1}-\mu_2&
+%     (R_{t1-1}-\mu_1)^2-\sigma_1^2 &
+%     (R_{t2-1}-\mu_2)^2-\sigma_2^2 
+% \end{bmatrix}
+% \]
 
-$\hat{\Gamma_1}=$
-% \resizebox{\textwidth}{!}{
-\[
-\begin{bmatrix}
-  \frac{\sum^T_2 (R_{t1}-\mu_1)(R_{t1-1}-\mu_1)}{T-1} &0&  \frac{\sum^T_2 (R_{t1}-\mu_1)(R_{t1-1}-\mu_1)^2}{T-1} &0\\
-    0& \frac{\sum^T_2 (R_{t2}-\mu_2)(R_{t2-1}-\mu_2)}{T-1} &0 & \frac{\sum^T_2 (R_{t2}-\mu_2)(R_{t2-1}-\mu_2)^2}{T-1}\\
-    \frac{\sum^T_2 (R_{t1-1}-\mu_1)(R_{t1-1}-\mu_1)^2}{T-1} &0 &\frac{\sum^T_2 (R_{t1-1}-\mu_1)^2(R_{t1-1}-\mu_1)^2}{T-1}+\sigma_1^4 &0\\
-    0 & \frac{\sum^T_2 (R_{t2-1}-\mu_2)(R_{t2-1}-\mu_2)^2}{T-1} & 0 & \frac{\sum^T_2 (R_{t2-1}-\mu_2)^2(R_{t2-1}-\mu_2)^2}{T-1}+\sigma_2^4\\  
-\end{bmatrix}
-\]
-% }
+% $\hat{\Gamma_1}=$
+% % \resizebox{\textwidth}{!}{
+% \[
+% \begin{bmatrix}
+%   \frac{\sum^T_2 (R_{t1}-\mu_1)(R_{t1-1}-\mu_1)}{T-1} &0&  \frac{\sum^T_2 (R_{t1}-\mu_1)(R_{t1-1}-\mu_1)^2}{T-1} &0\\
+%     0& \frac{\sum^T_2 (R_{t2}-\mu_2)(R_{t2-1}-\mu_2)}{T-1} &0 & \frac{\sum^T_2 (R_{t2}-\mu_2)(R_{t2-1}-\mu_2)^2}{T-1}\\
+%     \frac{\sum^T_2 (R_{t1-1}-\mu_1)(R_{t1-1}-\mu_1)^2}{T-1} &0 &\frac{\sum^T_2 (R_{t1-1}-\mu_1)^2(R_{t1-1}-\mu_1)^2}{T-1}+\sigma_1^4 &0\\
+%     0 & \frac{\sum^T_2 (R_{t2-1}-\mu_2)(R_{t2-1}-\mu_2)^2}{T-1} & 0 & \frac{\sum^T_2 (R_{t2-1}-\mu_2)^2(R_{t2-1}-\mu_2)^2}{T-1}+\sigma_2^4\\  
+% \end{bmatrix}
+% \]
+% % }
 
-$\hat{S_T} = $
-\[
-\begin{bmatrix}
-  \sigma_1^2 & 0 & 0 &0 \\
-  0 & \sigma_2^2 &0 &0 \\
-  0 & 0 & 2\sigma_1^4 & 0 \\
-  0 & 0 & 0 & 2\sigma_2^4 \\
-\end{bmatrix}
-+\frac{1}{2}(\hat{\Gamma_1}+\hat{\Gamma_1}')
-\]
+% $\hat{S_T} = $
+% \[
+% \begin{bmatrix}
+%   \sigma_1^2 & 0 & 0 &0 \\
+%   0 & \sigma_2^2 &0 &0 \\
+%   0 & 0 & 2\sigma_1^4 & 0 \\
+%   0 & 0 & 0 & 2\sigma_2^4 \\
+% \end{bmatrix}
+% +\frac{1}{2}(\hat{\Gamma_1}+\hat{\Gamma_1}')
+% \]
 
 \item 
 $H_0: \mu_1*\sigma_2 - \mu_2*\sigma_1 = 0 $\\
