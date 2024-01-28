@@ -287,7 +287,7 @@ therefore, the test statistic is $1.2602$ and the p-value is $0.2612$. Therefore
 
 \item Now we need to recalculate the standard error with the results in part (c). Our $\hat{V}_T$ is equal to $0.000005$ and test statistics is $3.1692$. The test statistics has been increased but it is still under the critical value of $3.841$, which means that we cannot reject the null hypothesis.
 
-\item 
+\item Now we use the bootstrap method to find a distribution of the Sharpe ratios. As we conducted the sample, we realized that our 95\% confidence interval contains zero, which means that still we cannot reject the null hypothesis and two stocks' Sharpe ratio are statistically indifferent.
 
 \begin{lstlisting}[language=Python, caption=Python code for Bootstrapping , label={lst:q1a}, escapechar=|, frame=single, basicstyle=\small, showstringspaces=false, captionpos=b, breaklines=true, showspaces=false, showtabs=false, keywordstyle=\color{blue}, commentstyle=\color{gray}]
   # Function to calculate Sharpe ratio
