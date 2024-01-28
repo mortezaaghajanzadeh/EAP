@@ -124,5 +124,26 @@
     return CW
     \end{lstlisting}
 
-    \item Now we construct the portfolio based on each model based on the strategy in the question. 
+    \item Now we want to compare the cumulative returns of the portfolios constructed based on the predicted excess returns of each model. The cumulative returns are calculated as:
+    \begin{equation*}
+        R_{t+1} = R_{t} + \hat{\omega}_{t,j}^*R_{t}^e
+    \end{equation*}
+    where $\hat{\omega}_{t,j}^*$ is the optimal weight of the portfolio at time $t$ and $j$ is the model. The optimal weights are calculated as:
+    \begin{equation*}
+        \hat{\omega}_{t,j}^* = \begin{cases}
+            2 & \text{if } \hat{\omega}_{t,j} \geq 2\\
+            \hat{\omega}_{t,j} & \text{if } -1 < \hat{\omega}_{t,j} < 2\\
+            -2 & \text{if } \hat{\omega}_{t,j} \leq -1\\
+        \end{cases} \quad \text{where } \quad \hat{\omega}_{t,j} = \frac{1}{\gamma}\dfrac{\hat{R}^e_{t,j}}{\hat{\sigma}^2_{R^e,t}}
+    \end{equation*}
+    where $\gamma$ is the risk aversion parameter and $\hat{\sigma}^2_{R^e,t}$ is the variance of the predicted excess returns over the last 60 months. The cumulative returns of the portfolios are shown in Figure \ref{fig:my_label}. We can see that the cumulative returns of the portfolios based on the DP and OLS models could not beat the benchmark which is the historical mean. However, the cumulative returns of the portfolio based on the CM model is able to beat the benchmark.
+
+    
+
+    \begin{figure}[htbp!]
+        \centering
+        \includegraphics[width=0.85\textwidth]{Out/Ex4_C.pdf}
+        \caption{Cumulative returns of the portfolios}
+        \label{fig:my_label}
+    \end{figure}
 \end{enumerate}

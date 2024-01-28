@@ -123,6 +123,8 @@ plt.xticks(ticket_values,rotation=45)
 plt.ylabel("Cumulative Return")
 plt.title("Cumulative Return of the Portfolios based on Different Prediction Models")
 plt.xlabel("Year-Month")
+plt.savefig("Out/Ex4_C.png",dpi=300,bbox_inches='tight')
+plt.savefig("Out/Ex4_C.pdf",dpi=300,bbox_inches='tight')
 plt.show()
 
 # %% (d) plot the weights
