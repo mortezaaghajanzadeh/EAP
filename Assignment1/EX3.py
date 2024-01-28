@@ -114,7 +114,7 @@ def estimate_new_model(r,x):
     df = pd.DataFrame({'r':r,'x':x})
     df['12_month_return'] = df['r'].rolling(12).sum()
     # get the pvalue of the regression
-    return sm.OLS(df['12_month_return'][11:], sm.add_constant(df['x'][11:])).fit().pvalues[1]
+    return sm.OLS(df['12_month_return'][11:].to_numpy(), sm.add_constant(df['x'][:-11]).to_numpy()).fit().pvalues[1]
 def new_simulation():
     pvalue = np.zeros(n_replications)
     for rep in range(n_replications):
@@ -125,17 +125,17 @@ np.random.seed(123)
 pvalue = new_simulation()
 [np.mean(pvalue<0.05),np.mean(pvalue<0.01),np.mean(pvalue<0.001)]
 #%% (c)
-def estimate_new_model(r,x):
+def estimate_new_model_neweywest(r,x):
     df = pd.DataFrame({'r':r,'x':x})
     df['12_month_return'] = df['r'].rolling(12).sum()
     # get the pvalue of the regression
-    return sm.OLS(df['12_month_return'][11:], sm.add_constant(df['x'][11:])).fit(cov_type='HAC', cov_kwds={'maxlags': 11}).pvalues[1]
-def new_simulation():
+    return sm.OLS(df['12_month_return'][11:].to_numpy(), sm.add_constant(df['x'][:-11]).to_numpy()).fit(cov_type='HAC', cov_kwds={'maxlags': 11}).pvalues[1]
+def new_simulation_neweywest():
     pvalue = np.zeros(n_replications)
     for rep in range(n_replications):
         r, x = generate_data()
         pvalue[rep] = estimate_new_model(r,x)
     return pvalue
 np.random.seed(123)
-pvalue = new_simulation()
+pvalue = new_simulation_neweywest()
 [np.mean(pvalue<0.05),np.mean(pvalue<0.01),np.mean(pvalue<0.001)]

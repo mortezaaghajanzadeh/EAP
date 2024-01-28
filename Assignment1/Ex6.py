@@ -1,9 +1,8 @@
 #%%
 import pandas as pd
 # import statsmodels.formula.api as sm
-import statsmodels.api as sm
-from tqdm import tqdm
-import numpy as np
+
+import matplotlib.pyplot as plt
 from arch import arch_model
 gamma = 2
 #%%
@@ -53,13 +52,35 @@ portfolio['Month'] = portfolio['Month'].astype(str)
 portfolio = portfolio.set_index('Month')
 portfolio = portfolio.cumprod()
 portfolio.plot()
+plt.figure(figsize=(10,5))
+plt.plot(portfolio,linewidth=1.5)
+plt.legend(['RW','GARCH'])
+ticket_values = list(range(0,len(portfolio),12))
+ticket_values.append(len(portfolio))
+plt.xticks(ticket_values,rotation=45)
+plt.ylabel("Cumulative Return")
+plt.title("Cumulative Return of the Portfolios based on Different Variance Models")
+plt.xlabel("Year-Month")
+plt.savefig("Out/Ex6_C.png",dpi=300,bbox_inches='tight')
+plt.savefig("Out/Ex6_C.pdf",dpi=300,bbox_inches='tight')
+plt.show()
+
 #%%
 weights = pd.DataFrame()
 weights = prediction_data[['Month','omega_RW','omega_hat_GARCH']].copy()
 weights = weights.dropna()
 weights['Month'] = weights['Month'].astype(str)
 weights = weights.set_index('Month')
-weights.plot()
+
+plt.plot(weights,linewidth=1.5)
+plt.legend(['RW','GARCH'])
+ticket_values = list(range(0,len(portfolio),24))
+ticket_values.append(len(portfolio))
+plt.xticks(ticket_values,rotation=45)
+plt.title("Weights of OLS and CM")
+plt.xlabel("Year-Month")
+plt.savefig("Out/Ex6_D.png",dpi=300,bbox_inches='tight')
+plt.savefig("Out/Ex6_D.pdf",dpi=300,bbox_inches='tight')
 #%%
 def utility(r,sigma, gamma):
     return r - 0.5*gamma*sigma**2
