@@ -257,7 +257,7 @@ Now we can calculate the test statistic as follows:
     \frac{T(\mu_1\sigma_2 - \mu_2\sigma_1)^2}{\hat{S}_T} \xrightarrow{d} \chi^2_1 \\
   \end{aligned}
 \end{equation*}
-\end{enumerate}
+
 Let's calculate the test statistic:
 \begin{equation*}
   \begin{aligned}
@@ -276,9 +276,58 @@ Let's calculate the test statistic:
       \end{bmatrix} = 0.001449 \\
   \end{aligned}
 \end{equation*}
+therefore, the test statistic is $1.2602$ and the p-value is $0.2612$. Therefore, we cannot reject the null hypothesis under 5\% significance level. Therefore, we can conclude that there is no significant difference between the Sharpe ratios of two stocks.
 
-\begin{enumerate}[(a)]
-    \item $f(v_t,\theta) = $
+\begin{lstlisting}[language=Python, caption=Python code for calculating the test statistics , label={lst:q1a}, escapechar=|, frame=single, basicstyle=\small, showstringspaces=false, captionpos=b, breaklines=true, showspaces=false, showtabs=false, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+  R_theta = mu_1*sigma_2 - mu_2*sigma_1
+  R_prime = np.array([sigma_2, -sigma_1, -mu_2, mu_1])
+  V_T = R_prime @ s_hat @ R_prime.T
+  test_stat = len(df) * (R_theta)**2 / V_T
+  \end{lstlisting}
+
+\item Now we need to recalculate the standard error with the results in part (c). Our $\hat{V}_T$ is equal to $0.000005$ and test statistics is $3.1692$. The test statistics has been increased but it is still under the critical value of $3.841$, which means that we cannot reject the null hypothesis.
+
+\item 
+
+\begin{lstlisting}[language=Python, caption=Python code for Bootstrapping , label={lst:q1a}, escapechar=|, frame=single, basicstyle=\small, showstringspaces=false, captionpos=b, breaklines=true, showspaces=false, showtabs=false, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+  # Function to calculate Sharpe ratio
+def calculate_sharpe_ratio(returns):
+    return np.mean(returns) / np.std(returns)
+
+# Parameters
+n_iterations = 10000
+confidence_level = 0.95
+
+# Calculate observed Sharpe ratio difference
+sharpe_ratio_diff_observed = calculate_sharpe_ratio(R1) - calculate_sharpe_ratio(R2)
+
+# Bootstrap procedure
+
+sharpe_ratio_diff_bootstrap = []
+np.random.seed(123)
+for _ in range(n_iterations):
+    # Generate bootstrapped samples
+    bootstrap_sample_stock1 = np.random.choice(R1, size=len(R1), replace=True)
+    bootstrap_sample_stock2 = np.random.choice(R2, size=len(R2), replace=True)
+
+    # Calculate Sharpe ratios for bootstrapped samples
+    sharpe_ratio_stock1 = calculate_sharpe_ratio(bootstrap_sample_stock1)
+    sharpe_ratio_stock2 = calculate_sharpe_ratio(bootstrap_sample_stock2)
+
+    # Store the Sharpe ratio difference
+    sharpe_ratio_diff_bootstrap.append(sharpe_ratio_stock1 - sharpe_ratio_stock2)
+
+# Calculate 95% confidence interval
+lower_bound, upper_bound = np.percentile(sharpe_ratio_diff_bootstrap, [(1 - confidence_level) * 100 / 2, confidence_level * 100 - (1 - confidence_level) * 100 / 2])
+
+print(f'Observed Sharpe Ratio Difference: {sharpe_ratio_diff_observed:.4f}')
+print(f'95% Confidence Interval: [{lower_bound:.4f}, {upper_bound:.4f}]')
+# The sharp ratio difference is not significant at 5% level.
+
+\end{lstlisting}
+\end{enumerate}
+% \begin{enumerate}[(a)]
+%     \item $f(v_t,\theta) = $
 %     \[
 % \begin{bmatrix}
 %     R_{t1}-\mu_1 \\
@@ -331,7 +380,7 @@ Let's calculate the test statistic:
 % $\hat{\sigma_1^2}=\frac{\sum (R_{t1}-\hat{\mu_1})^2}{T}$
 % $\hat{\sigma_2^2}=\frac{\sum (R_{t2}-\hat{\mu_2})^2}{T}$
 
-\item 
+% \item 
 % $f(v,\theta) f(v,\theta)'=$
 % \[
 % \begin{bmatrix}
@@ -359,7 +408,7 @@ Let's calculate the test statistic:
 % \end{bmatrix}
 % \]
 
-\item 
+% \item 
 % $f(v_t,\theta) f(v_{t-1},\theta)'=$
 % \[
 % \begin{bmatrix}
@@ -399,43 +448,43 @@ Let's calculate the test statistic:
 % +\frac{1}{2}(\hat{\Gamma_1}+\hat{\Gamma_1}')
 % \]
 
-\item 
-$H_0: \mu_1*\sigma_2 - \mu_2*\sigma_1 = 0 $\\
-$R (\theta) = \mu_1*\sigma_2 - \mu_2*\sigma_1$\\
-$\theta = $
-\[
-\begin{bmatrix}
-  \mu_1 \\
-  \mu_2 \\
-  \sigma_1\\
-  \sigma_2 \\
-\end{bmatrix}
-\]
-$\frac{\partial R(\theta)}{\theta '}=$
-\[
-\begin{bmatrix}
-  \sigma_2 & -\sigma_1 & -\mu_2 & \mu_1
-\end{bmatrix}
-\]
-$T(R(\hat{\theta_T})'[\frac{\partial R(\theta)}{\theta '}\hat{V}\frac{\partial R(\theta)}{\theta '}']^{-1}(R(\hat{\theta}) \sim \chi^2$\\
-Sharpe Ratio Stock 1: 0.1113\\
-Sharpe Ratio Stock 2: 0.0352\\
-T-test Statistic: 1.4645\\
-p-value: 0.1433
-Fail to reject the null hypothesis: No significant difference in Sharpe ratios.
-\item 
-After  introducing the correlation matrix: \\
-Sharpe Ratio Stock 1: 0.1113\\
-Sharpe Ratio Stock 2: 0.0352\\
-Sample Correlation: 0.4187\\
-T-test Statistic: 12.5329\\
-Degrees of Freedom: 1198\\
-p-value: 0.0000\\
-Reject the null hypothesis: Stocks have different Sharpe ratios.
-\item 
-Observed Sharpe Ratio Difference: 0.0761\\
-95\% Confidence Interval: [-0.0325, 0.1561]\\
-The sharp ratio difference is not significant at 5\% level.
+% \item 
+% $H_0: \mu_1*\sigma_2 - \mu_2*\sigma_1 = 0 $\\
+% $R (\theta) = \mu_1*\sigma_2 - \mu_2*\sigma_1$\\
+% $\theta = $
+% \[
+% \begin{bmatrix}
+%   \mu_1 \\
+%   \mu_2 \\
+%   \sigma_1\\
+%   \sigma_2 \\
+% \end{bmatrix}
+% \]
+% $\frac{\partial R(\theta)}{\theta '}=$
+% \[
+% \begin{bmatrix}
+%   \sigma_2 & -\sigma_1 & -\mu_2 & \mu_1
+% \end{bmatrix}
+% \]
+% $T(R(\hat{\theta_T})'[\frac{\partial R(\theta)}{\theta '}\hat{V}\frac{\partial R(\theta)}{\theta '}']^{-1}(R(\hat{\theta}) \sim \chi^2$\\
+% Sharpe Ratio Stock 1: 0.1113\\
+% Sharpe Ratio Stock 2: 0.0352\\
+% T-test Statistic: 1.4645\\
+% p-value: 0.1433
+% Fail to reject the null hypothesis: No significant difference in Sharpe ratios.
+% \item 
+% After  introducing the correlation matrix: \\
+% Sharpe Ratio Stock 1: 0.1113\\
+% Sharpe Ratio Stock 2: 0.0352\\
+% Sample Correlation: 0.4187\\
+% T-test Statistic: 12.5329\\
+% Degrees of Freedom: 1198\\
+% p-value: 0.0000\\
+% Reject the null hypothesis: Stocks have different Sharpe ratios.
+% \item 
+% Observed Sharpe Ratio Difference: 0.0761\\
+% 95\% Confidence Interval: [-0.0325, 0.1561]\\
+% The sharp ratio difference is not significant at 5\% level.
 
-\end{enumerate}
+% \end{enumerate}
 
