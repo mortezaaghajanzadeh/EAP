@@ -37,7 +37,7 @@ x = np.array([df[['Stock1','Stock2']]])[0]
 s_hat = sum([s(theta,i) for i in x])/len(x)
 # set non-diagonal elements to zero
 s_hat = s_hat * np.eye(4)
-print("The estimated standard error of estimation:\n {}".format(s_hat_out.round(4)))
+print("The estimated standard error of estimation:\n {}".format(s_hat.round(4)))
 #%% (c) compute the Newey-West standard errors
 theta = np.array([mu_1,mu_2, sigma_1, sigma_2])
 lag = 1
