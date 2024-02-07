@@ -1,0 +1,51 @@
+\documentclass[a4paper,10pt,american]{article}
+\usepackage[a4paper,margin=1.2in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts,mathrsfs,accents} %important math packages
+\usepackage{enumerate} % package for making different lists
+\usepackage[T1]{fontenc} % Encoding of fonts
+\usepackage{lmodern} % Latin modern font - needed for fontenc
+\usepackage[utf8]{inputenc} % Encoding of input text
+\usepackage[kerning]{microtype} % Better looking text
+\usepackage[babel]{csquotes} % Better looking quotes
+\usepackage{booktabs} % Better looking tables
+\usepackage{babel} % Language control, for hyphenation etc
+\usepackage{amsthm} % Package for theorem and definition enviroments
+\usepackage[normalem]{ulem}
+\usepackage{graphicx}
+\usepackage{pgfplots}
+
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.12}
+\usetikzlibrary{patterns}
+\usepgfplotslibrary{fillbetween}
+\usepackage{listings}
+\def \p{\par
+\vspace{10pt}}
+
+\def \sp{\par
+\vspace{4pt}}
+
+\setlength{\parindent}{0pt}
+\newcommand{\ubar}[1]{\text{\b{$#1$}}}
+
+% define command for convenience
+\newcommand{\reals}{\mathbb{R}}
+
+\title{Empirical Asset Pricing \\Assignment 01}
+\author{Morteza Aghajanzadeh\thanks{Department of Finance, Stockholm School of Economics. Email: morteza.aghajanzadeh@phdstudent.hhs.se} \and Ge Song\thanks{Department of Finance, Stockholm School of Economics. Email: ge.song@phdstudent.hhs.se}}
+
+\date{\today}
+\setlength\parindent{0pt}
+
+\newcommand\scalemath[2]{\scalebox{#1}{\mbox{\ensuremath{\displaystyle #2}}}}
+
+
+\begin{document}
+	\maketitle
+
+\input{Answers/Q1.tex}
+\end{document}

@@ -1,0 +1,118 @@
+
+\section*{Question 1}
+\begin{enumerate}[(a)]
+
+  \item 
+  \item 
+  \item 
+  \item Let's define the variabels as follows:
+  \begin{equation*}
+    \begin{aligned}
+      f(v_t,\theta) = & \begin{bmatrix}
+        \Delta c_t - \mu_c \\
+        r_{m,t} - \mu_m \\
+        r_{m,t} - r_{f,t} + \frac{1}{2} (r_{m,t} - \mu_m)^2 - \gamma (r_{m,t} - \mu_m)(\Delta c_t - \mu_c) \\
+        r_{f,t} + \ln(\delta) -\gamma\Delta c_t +  \frac{1}{2}\gamma^2 (\Delta c_t - \mu_c)^2 \\
+      \end{bmatrix} & , \quad 
+      \theta = & \begin{bmatrix}
+        \mu_c \\
+        \mu_m \\
+        \gamma \\
+        \delta \\
+      \end{bmatrix}  \\
+      g_T(\theta) = & \quad \frac{1}{T} \sum_{t=1}^T f(v_t,\theta) & \\
+    \end{aligned}
+    \end{equation*}
+    As we can see, the system is exactly identified, since the number of parameters is equal to the number of moments. So, we can use the GMM estimator to estimate the parameters.
+    
+      \begin{gather*}
+        g_T(\theta) = 0\\
+        \Rightarrow\frac{1}{T} \sum_{t=1}^T f(v_t,\theta) = 0\\
+        \Rightarrow\frac{1}{T} \sum_{t=1}^T \begin{bmatrix}
+          \Delta c_t - \mu_c \\
+          r_{m,t} - \mu_m \\
+          r_{m,t} - r_{f,t} + \frac{1}{2} (r_{m,t} - \mu_m)^2 - \gamma (r_{m,t} - \mu_m)(\Delta c_t - \mu_c) \\
+          r_{f,t} + \ln(\delta) -\gamma\Delta c_t +  \frac{1}{2}\gamma^2 (\Delta c_t - \mu_c)^2 \\
+        \end{bmatrix} = 0 
+      \end{gather*}
+        \begin{gather*}
+        \Rightarrow \begin{bmatrix}
+          \frac{1}{T} \sum_{t=1}^T \Delta c_t - \mu_c \\
+          \frac{1}{T} \sum_{t=1}^T r_{m,t} - \mu_m \\
+          \frac{1}{T} \sum_{t=1}^T r_{m,t} - r_{f,t} + \frac{1}{2} (r_{m,t} - \mu_m)^2 - \gamma (r_{m,t} - \mu_m)(\Delta c_t - \mu_c) \\
+          \frac{1}{T} \sum_{t=1}^T r_{f,t} + \ln(\delta) -\gamma\Delta c_t +  \frac{1}{2}\gamma^2 (\Delta c_t - \mu_c)^2 \\
+        \end{bmatrix} = 0 
+      \end{gather*}
+      \begin{equation*}
+        \Rightarrow \begin{bmatrix}
+          \mathbb{E} [\Delta c_t] - \mu_c \\
+          \mathbb{E} [r_{m,t}] - \mu_m \\
+          \mathbb{E} [r_{m,t}- r_{f,t}]  + \frac{1}{2}\mathbb{E} [ (r_{m,t} - \mu_m)^2] - \gamma \mathbb{E} [(r_{m,t} - \mu_m)(\Delta c_t - \mu_c)] \\
+          \mathbb{E} [r_{f,t}] + \ln(\delta) -\gamma\mathbb{E} [\Delta c_t] +  \frac{1}{2}\gamma^2 \mathbb{E} [(\Delta c_t - \mu_c)^2] \\
+        \end{bmatrix} = 0
+      \end{equation*}
+      \begin{equation*}
+        \Rightarrow \begin{bmatrix}
+          \mu_c - \mathbb{E} [\Delta c_t] \\
+          \mu_m - \mathbb{E} [r_{m,t}] \\
+          \gamma - \frac{\mathbb{E} [r_{m,t}- r_{f,t}] + \hat{\sigma}_m^2/2}{\hat{\sigma}_{mc} } \\
+          \delta - exp(- \mathbb{E} [r_{f,t}] + \gamma\mathbb{E} [\Delta c_t] - \frac{1}{2}\gamma^2 \sigma_c^2 )  \\
+        \end{bmatrix} = 0
+      \end{equation*}
+      \begin{equation*}
+        \rightarrow  \theta = \begin{bmatrix}
+          \mathbb{E} [\Delta c_t] \\
+          \mathbb{E} [r_{m,t}] \\
+          \frac{\mathbb{E} [r_{m,t}- r_{f,t}] + \hat{\sigma}_m^2/2}{\hat{\sigma}_{mc} } \\
+          exp(- \mathbb{E} [r_{f,t}] + \gamma\mathbb{E} [\Delta c_t] - \frac{1}{2}\gamma^2 \sigma_c^2 )  \\
+        \end{bmatrix}
+      \end{equation*}
+      where $\hat{\sigma}_m^2$ is the sample variance of $r_{m,t}$ and $\hat{\sigma}_{mc}$ is the sample covariance of $r_{m,t}$ and $\Delta c_t$.
+
+      As we can see it is the same method as we used for estimating in the first method of previous question. The only difference is that now we can estimate the variance of the estimator by using the equation for the variance of the GMM estimator.
+    
+      \begin{equation*}
+        \hat{S}_T = \frac{1}{T} \sum_{t=1}^T f(v_t,\hat{\theta})f(v_t,\hat{\theta})
+      \end{equation*}
+      where $\hat{\theta}$ is the estimated parameter vector. 
+
+      Calculate the variance of the estimator analytically is a bit more complicated, but it is possible. I will only drive the variance of the estimator numerically.
+
+      \item Now we change the target moments to be the following:
+      \begin{equation*}
+        \begin{aligned}
+          f(v_t,\theta) = & \begin{bmatrix}
+            \exp(\ln(\delta) - \gamma\Delta c_t + r_{m,t})-1 \\
+            \exp(\ln(\delta) - \gamma\Delta c_t + r_{f,t})-1
+          \end{bmatrix} & , \quad 
+          \theta = & \begin{bmatrix}
+            \mu_c \\
+            \mu_m \\
+            \gamma \\
+            \delta \\
+          \end{bmatrix}  \\
+          g_T(\theta) = & \quad \frac{1}{T} \sum_{t=1}^T f(v_t,\theta) & \\
+        \end{aligned}
+        \end{equation*}
+        as we can see, the system is underidentified, since the number of parameters is greater than the number of moments. So, we need to find a proper weighting matrix to estimate the parameters. From the slides, we know that the optimal weighting matrix is :
+        \begin{equation*}
+          A_T = \hat{D}_T^{'}W_T \quad \text{where} \quad \hat{D}_T = \dfrac{\partial{g_T}(\hat{\theta}_T)}{\partial \theta^{'}}
+        \end{equation*}
+        where $W_T$ is the weighting matrix. We start by calculating the derivative of the moments with respect to the parameters:
+        \begin{equation*}
+          \begin{split}
+            \frac{\partial f(v_t,\theta)}{\partial \theta^{'}} & = \begin{bmatrix}
+              0 & 0 & -\exp(\ln(\delta) - \gamma\Delta c_t + r_{m,t})\Delta c_t & \frac{1}{\delta}\exp(\ln(\delta) - \gamma\Delta c_t + r_{m,t}) \\
+              0 & 0 & -\exp(\ln(\delta) - \gamma\Delta c_t + r_{f,t})\Delta c_t & \frac{1}{\delta}\exp(\ln(\delta) - \gamma\Delta c_t + r_{f,t}) \\
+            \end{bmatrix} \\
+            \Rightarrow \hat{D}_T & = \frac{1}{T} \sum_{t=1}^T \frac{\partial f(v_t,\theta)}{\partial \theta^{'}}
+          \end{split}
+        \end{equation*}
+
+        Now we have the derivative of the moments with respect to the parameters, we will try to find the optimal weighting matrix by using the following equation:
+        \begin{gather*}
+          A_T = \hat{D}_T^{'}W_T \Rightarrow A_T g_T(\theta) = 0 \\
+        \end{gather*}
+      
+
+\end{enumerate}
