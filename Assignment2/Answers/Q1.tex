@@ -86,33 +86,30 @@
             \exp(\ln(\delta) - \gamma\Delta c_t + r_{f,t})-1
           \end{bmatrix} & , \quad 
           \theta = & \begin{bmatrix}
-            \mu_c \\
-            \mu_m \\
             \gamma \\
             \delta \\
           \end{bmatrix}  \\
           g_T(\theta) = & \quad \frac{1}{T} \sum_{t=1}^T f(v_t,\theta) & \\
         \end{aligned}
         \end{equation*}
-        as we can see, the system is underidentified, since the number of parameters is greater than the number of moments. So, we need to find a proper weighting matrix to estimate the parameters. From the slides, we know that the optimal weighting matrix is :
-        \begin{equation*}
-          A_T = \hat{D}_T^{'}W_T \quad \text{where} \quad \hat{D}_T = \dfrac{\partial{g_T}(\hat{\theta}_T)}{\partial \theta^{'}}
-        \end{equation*}
-        where $W_T$ is the weighting matrix. We start by calculating the derivative of the moments with respect to the parameters:
-        \begin{equation*}
-          \begin{split}
-            \frac{\partial f(v_t,\theta)}{\partial \theta^{'}} & = \begin{bmatrix}
-              0 & 0 & -\exp(\ln(\delta) - \gamma\Delta c_t + r_{m,t})\Delta c_t & \frac{1}{\delta}\exp(\ln(\delta) - \gamma\Delta c_t + r_{m,t}) \\
-              0 & 0 & -\exp(\ln(\delta) - \gamma\Delta c_t + r_{f,t})\Delta c_t & \frac{1}{\delta}\exp(\ln(\delta) - \gamma\Delta c_t + r_{f,t}) \\
-            \end{bmatrix} \\
-            \Rightarrow \hat{D}_T & = \frac{1}{T} \sum_{t=1}^T \frac{\partial f(v_t,\theta)}{\partial \theta^{'}}
-          \end{split}
-        \end{equation*}
-
-        Now we have the derivative of the moments with respect to the parameters, we will try to find the optimal weighting matrix by using the following equation:
+        again the system is exactly identified, since the number of parameters is equal to the number of moments. So, we can use the GMM estimator to estimate the parameters.
         \begin{gather*}
-          A_T = \hat{D}_T^{'}W_T \Rightarrow A_T g_T(\theta) = 0 \\
+          g_T(\theta) = 0\\
+          \Rightarrow\frac{1}{T} \sum_{t=1}^T f(v_t,\theta) = 0\\
+          \Rightarrow\frac{1}{T} \sum_{t=1}^T \begin{bmatrix}
+            \exp(\ln(\delta) - \gamma\Delta c_t + r_{m,t})-1 \\
+            \exp(\ln(\delta) - \gamma\Delta c_t + r_{f,t})-1
+          \end{bmatrix} = 0\\
+          \Rightarrow \begin{bmatrix}
+            \frac{1}{T} \sum_{t=1}^T \exp(\ln(\delta) - \gamma\Delta c_t + r_{m,t})-1 \\
+            \frac{1}{T} \sum_{t=1}^T \exp(\ln(\delta) - \gamma\Delta c_t + r_{f,t})-1
+          \end{bmatrix} = 0\\
+          \Rightarrow \begin{bmatrix}
+            \mathbb{E} [\exp(\ln(\delta) - \gamma\Delta c_t + r_{m,t})]-1 \\
+            \mathbb{E} [\exp(\ln(\delta) - \gamma\Delta c_t + r_{f,t})]-1
+          \end{bmatrix} = 0
         \end{gather*}
-      
+
+        As our target moments are non-linear, we can not use the same method as we used for the linear moments. So we need to use the numerical optimization methods to estimate the parameters. 
 
 \end{enumerate}
