@@ -224,9 +224,9 @@ for i in models:
     test_mkt_results[i] = run_time_series_test(vol_mkt_portfolios, factors, models[i], sampleStart, sampleEnd)
     test_mkt_out_results[i] = run_time_series_test(vol_mkt_portfolios, factors, models[i], pubYear)
 
-pd.DataFrame(test_results,index = [r'$\alpha$','$Pvalue$']).T.to_latex(data_out + "/3_d1_in.tex", float_format="%1.3f",column_format="lcc",column_format="lcc")
-pd.DataFrame(test_out_results,index = [r'$\alpha$','$Pvalue$']).T.to_latex(data_out + "/3_d1_out.tex", float_format="%1.3f",column_format="lcc",column_format="lcc")
-pd.DataFrame(test_mkt_results,index = [r'$\alpha$','$Pvalue$']).T.to_latex(data_out + "/3_d2_in.tex", float_format="%1.3f",column_format="lcc",column_format="lcc")
+pd.DataFrame(test_results,index = [r'$\alpha$','$Pvalue$']).T.to_latex(data_out + "/3_d1_in.tex", float_format="%1.3f",column_format="lcc")
+pd.DataFrame(test_out_results,index = [r'$\alpha$','$Pvalue$']).T.to_latex(data_out + "/3_d1_out.tex", float_format="%1.3f",column_format="lcc")
+pd.DataFrame(test_mkt_results,index = [r'$\alpha$','$Pvalue$']).T.to_latex(data_out + "/3_d2_in.tex", float_format="%1.3f",column_format="lcc")
 pd.DataFrame(test_mkt_out_results,index = [r'$\alpha$','$Pvalue$']).T.to_latex(data_out + "/3_d2_out.tex", float_format="%1.3f",column_format="lcc")
 
 

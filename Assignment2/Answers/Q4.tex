@@ -1,0 +1,53 @@
+\section*{Question 4}
+
+
+\begin{enumerate}[(a)]
+
+\item Here we create the long-short portfolio. The long-short portfolio is created by taking the difference between the returns of the highest and the lowest portfolio. The result is shown in the figure \ref{fig:3c}.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{Out/4_3.pdf}
+    \caption{Time series of the average returns of the long-short portfolio.}
+    \label{fig:3c}
+\end{figure}
+
+Now we can test the CAPM, Fama-French 3 factors and the Fama-French 5 factors, Carhart, and HXZ models. You can find the function that I write to test the null hypothesis that $\alpha_{LS} =0$. I will get the p-value of the test.   
+
+
+
+\begin{table}[htbp]
+    \caption{$\alpha$ test for long-short portfolio with different models}
+    \begin{tabularx}{\linewidth}{CC}
+        \caption*{Equal Weighted }
+        \input{Out/4_c1.tex}
+        &
+        \caption*{Market Weighted }
+        \input{Out/4_c2.tex}
+    \end{tabularx}
+\end{table}
+\item 
+
+\begin{table}[htbp]
+    \caption{$\alpha$ test long-short portfolio for in and out of sample with equal weighting}
+    \begin{tabularx}{\linewidth}{CC}
+        \caption*{Sample period }
+        \input{Out/4_d1_in.tex}
+        &
+        \caption*{Post-publication period}
+        \input{Out/4_d1_out.tex}
+    \end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+    \caption{$\alpha$ test long-short portfolio for in and out of sample with market weighting}
+    \begin{tabularx}{\linewidth}{CC}
+        \caption*{Sample period }
+        \input{Out/4_d2_in.tex}
+        &
+        \caption*{Post-publication period}
+        \input{Out/4_d2_out.tex}
+    \end{tabularx}
+\end{table}
+
+
+\end{enumerate}

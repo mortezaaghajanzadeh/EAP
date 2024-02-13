@@ -21,11 +21,14 @@
     \Rightarrow \gamma = \frac{\mathbb{E}[r_{i,t}-r_{f,t}] + \frac{\sigma^2_i}{2}}{\sigma_{ic}} 
   \end{gather*}
   \begin{enumerate}[i.]
-   \item  If we use the sample moments for calculating the parameters, we get that $\gamma_1 = 1.358$.
+   \item  If we use the sample moments for calculating the parameters, we get that $\gamma_1 = 166.711$.
    \item If we assume that the correlation between
-   excess returns on stocks and consumption growth equals one, we get that $\gamma_2 = 16.585$.
+   excess returns on stocks and consumption growth equals one, we get that $\gamma_2 = 17.51$.
   \end{enumerate}
-  The outcomes differ, as expected, given our assumption of perfect correlation between stock returns and consumption growth in the second scenario. This assumption results in a significantly high value for the risk aversion parameter $\gamma$. The strong correlation implies that stock returns are highly responsive to changes in consumption growth, increasing their riskiness and consequently elevating the value of $\gamma$.
+  The outcomes differ, as expected, given our assumption of perfect correlation between stock returns and consumption growth in the second scenario. This assumption results in a significantly lower estimate of the risk aversion parameter. 
+
+
+
   \item Now we need to use the estimated parameters to estimate the time discount factor $\delta$. We can use the equation (3) in the question to estimate the time discount factor. The equation is as follows:
   \begin{gather*}
     r_{f,t} = - \ln(\delta) + \gamma\mathbb{E}[\Delta c_t ] - \frac{\gamma^2 \sigma_c^2}{2} 
@@ -37,9 +40,10 @@
   \end{gather*}
   which for given moments and different values of $\gamma$ we get the following values for $\delta$:
   \begin{enumerate}[i.]
-    \item Base on $\gamma_1$, we get that $\delta_1 = 1.019$ and time preference rate of $ -0.019$.
-    \item Base on $\gamma_2$, we get that $\delta_2 = 1.267$ and time preference rate of $-0.237$.
+    \item Base on $\gamma_1$, we get that $\delta_1 = 0.037$ and time preference rate of $ 3.293$.
+    \item Base on $\gamma_2$, we get that $\delta_2 = 1.278$ and time preference rate of $-0.245$.
   \end{enumerate}
+
 
   \item Now we need to use the GMM estimator to estimate the parameters in order to have standard errors for the estimators. Let's define the variables as follows:
   \begin{equation*}
@@ -118,6 +122,15 @@
         \label{tab:1d}
         \include{Out/1d}
       \end{table}
+      Here we can see that the standard errors of the estimators for $\delta$ are very high and the estimators are not reliable. The reason is that the estimators are highly sensitive to the estimated parameters. As we can see, the estimated parameters are very different from each other and the estimators for $\delta$ are very different from each other.
+
+      For imposing the assumption about the correlation between stock returns and consumption growth, I will add the following moments to the previous moments:
+      \begin{gather*}
+        \mathbb{E}[(r_{m,t} - \mu_m)^2] - \sigma_m^2 = 0\\
+        \mathbb{E}[(\Delta c_t - \mu_c)^2] - \sigma_c^2 = 0\\
+        \mathbb{E}[(r_{m,t} - \mu_m)(\Delta c_t - \mu_c)] / \sigma_m \sigma_c  - 1 = 0
+      \end{gather*}
+      here we need to estimate two additional parameters.
 
       \item Now we change the target moments to be the following:
       \begin{equation*}
@@ -179,6 +192,7 @@
               return (FOC(theta,x).T @ FOC(theta,x))[0][0]
     \end{lstlisting}
     
+    The estimated parameters are shown in the table \ref{tab:1e} and the Newey-West adjusted variance of the estimator is shown in the table \ref{tab:1e_sd}.
     \begin{table}[htbp!]
       \centering
       \caption{Estimation of the parameters for the non-linear moments}

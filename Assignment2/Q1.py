@@ -32,9 +32,10 @@ pd.DataFrame(estimation_results, index=['$\mu$', '$\sigma$', r'$\rho_1$']).renam
 #% Sample correlation matrix
 
 # calculate the correlation matrix
-corr_df = consumption_df[['ConsGrowth', 'Market', 'Rfree', 'Re']].cov()
 
+corr_df = consumption_df[['ConsGrowth', 'Market', 'Rfree', 'Re']].corr()
 corr_df.rename(index={'ConsGrowth': '$\Delta c$', 'Market': '$r_{m,t}$', 'Rfree': '$r_{f,t}$', 'Re': '$r_{e,t}$'}, columns={'ConsGrowth': '$\Delta c$', 'Market': '$r_{m,t}$', 'Rfree': '$r_{f,t}$', 'Re': '$r_{e,t}$'}).to_latex(data_out + "/1a_corr.tex", float_format="%.3f",)
+corr_df = consumption_df[['ConsGrowth', 'Market', 'Rfree', 'Re']].cov()
 # %% (b)
 # The first estimation:
 gamma_1 = (
