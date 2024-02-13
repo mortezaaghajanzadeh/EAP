@@ -2,10 +2,46 @@
 \section*{Question 1}
 \begin{enumerate}[(a)]
 
-  \item 
-  \item 
-  \item 
-  \item Let's define the variabels as follows:
+  \item Here are the moments and the correlation of the moments:
+  \begin{table}[htbp!]
+    \centering
+    \caption{Table of the moments}
+    \label{tab:1a}
+    \include{Out/1a}
+  \end{table}
+  \begin{table}[htbp!]
+    \centering
+    \caption{Table of the correlation of the moments}
+    \label{tab:1a_corr}
+    \include{Out/1a_corr}
+  \end{table}
+  \item Given the moments and correlation that we calculate in the previous question, we can use the equation (2) in the question to estimate the parameters. The equation is as follows:
+  \begin{gather*}
+    \mathbb{E}[r_{i,t}-r_{f,t}] + \frac{\sigma^2_i}{2} = \gamma \sigma_{ic} \\
+    \Rightarrow \gamma = \frac{\mathbb{E}[r_{i,t}-r_{f,t}] + \frac{\sigma^2_i}{2}}{\sigma_{ic}} 
+  \end{gather*}
+  \begin{enumerate}[i.]
+   \item  If we use the sample moments for calculating the parameters, we get that $\gamma_1 = 1.358$.
+   \item If we assume that the correlation between
+   excess returns on stocks and consumption growth equals one, we get that $\gamma_2 = 16.585$.
+  \end{enumerate}
+  The outcomes differ, as expected, given our assumption of perfect correlation between stock returns and consumption growth in the second scenario. This assumption results in a significantly high value for the risk aversion parameter $\gamma$. The strong correlation implies that stock returns are highly responsive to changes in consumption growth, increasing their riskiness and consequently elevating the value of $\gamma$.
+  \item Now we need to use the estimated parameters to estimate the time discount factor $\delta$. We can use the equation (3) in the question to estimate the time discount factor. The equation is as follows:
+  \begin{gather*}
+    r_{f,t} = - \ln(\delta) + \gamma\mathbb{E}[\Delta c_t ] - \frac{\gamma^2 \sigma_c^2}{2} 
+  \end{gather*}
+  as we write the equation for the average of the risk-free rate, we get:
+  \begin{gather*}
+    \mathbb{E}[r_{f,t}] = - \ln(\delta) + \gamma\mathbb{E}[\Delta c_t ] - \frac{\gamma^2 \sigma_c^2}{2}\\
+    \Rightarrow \delta = \exp(- \mathbb{E}[r_{f,t}] + \gamma\mathbb{E}[\Delta c_t ] - \frac{\gamma^2 \sigma_c^2}{2} )
+  \end{gather*}
+  which for given moments and different values of $\gamma$ we get the following values for $\delta$:
+  \begin{enumerate}[i.]
+    \item Base on $\gamma_1$, we get that $\delta_1 = 1.019$ and time preference rate of $ -0.019$.
+    \item Base on $\gamma_2$, we get that $\delta_2 = 1.267$ and time preference rate of $-0.237$.
+  \end{enumerate}
+
+  \item Now we need to use the GMM estimator to estimate the parameters in order to have standard errors for the estimators. Let's define the variables as follows:
   \begin{equation*}
     \begin{aligned}
       f(v_t,\theta) = & \begin{bmatrix}
@@ -69,14 +105,19 @@
       \end{equation*}
       where $\hat{\sigma}_m^2$ is the sample variance of $r_{m,t}$ and $\hat{\sigma}_{mc}$ is the sample covariance of $r_{m,t}$ and $\Delta c_t$.
 
-      As we can see it is the same method as we used for estimating in the first method of previous question. The only difference is that now we can estimate the variance of the estimator by using the equation for the variance of the GMM estimator.
-    
+      As we can see it is the same method as we used for estimating in the first method of previous question. The only difference is that now we can estimate the variance of the estimator by using the equation for the variance of the GMM estimator. The Newey-West adjusted variance of the estimator is as follows:    
       \begin{equation*}
-        \hat{S}_T = \frac{1}{T} \sum_{t=1}^T f(v_t,\hat{\theta})f(v_t,\hat{\theta})
+        \hat{S}_T = \frac{1}{T} \sum_{t=1}^T f(v_t,\hat{\theta})f(v_t,\hat{\theta}) + \frac{1}{2}(\hat{\Gamma}_1 + \hat{\Gamma}_1')
       \end{equation*}
       where $\hat{\theta}$ is the estimated parameter vector. 
 
-      Calculate the variance of the estimator analytically is a bit more complicated, but it is possible. I will only drive the variance of the estimator numerically.
+      Calculate the variance of the estimator analytically is a bit more complicated, but it is possible. I will only drive the variance of the estimator numerically. 
+      \begin{table}[htbp!]
+        \centering
+        \caption{Newey-West adjusted variance of the estimator}
+        \label{tab:1d}
+        \include{Out/1d}
+      \end{table}
 
       \item Now we change the target moments to be the following:
       \begin{equation*}
@@ -112,4 +153,42 @@
 
         As our target moments are non-linear, we can not use the same method as we used for the linear moments. So we need to use the numerical optimization methods to estimate the parameters. 
 
+        Here we use the FOC of the GMM estimator which is as follows:
+        \begin{equation*}
+          g_T(\theta) = 0
+        \end{equation*}
+        and in the optimization I try to minimize the loss function which is quadratic one.
+        \begin{lstlisting}[language=Python, caption= Python code for defining the moments and the loss function for the non-linear moments, label={pcode:1e}, escapechar=|, frame=single, basicstyle=\small, showstringspaces=false, captionpos=b, breaklines=true, showspaces=false, showtabs=false, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+          def f_v(theta,x):
+            gamma = theta[0]
+            delta = theta[1]
+            x_c = x[0]
+            x_m = x[1]
+            x_e = x[2]
+            r_f = x_m - x_e
+            f = np.array([
+                np.exp(np.log(delta) - gamma * x_c + x_m) - 1,
+                np.exp(np.log(delta) - gamma * x_c + r_f) - 1,
+                ]).reshape(len(theta),1)
+            return f
+
+          def FOC(theta,x):
+              return sum([f_v(theta,i) for i in x])/len(x)
+
+          def loss(theta,x):
+              return (FOC(theta,x).T @ FOC(theta,x))[0][0]
+    \end{lstlisting}
+    
+    \begin{table}[htbp!]
+      \centering
+      \caption{Estimation of the parameters for the non-linear moments}
+      \label{tab:1e}
+      \include{Out/1e}
+    \end{table}
+    \begin{table}[htbp!]
+      \centering
+      \caption{Newey-West adjusted variance of the estimator for the non-linear moments}
+      \label{tab:1e_sd}
+      \include{Out/1e_sd}
+    \end{table}
 \end{enumerate}

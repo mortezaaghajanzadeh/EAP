@@ -1,0 +1,102 @@
+\section*{Question 3}
+I just wrote a function that create the portfolios and calculate the portfolio return based on "Equal" and "Market" weighting. The function is shown in the code \ref{pcode:3a}. The function takes the following inputs:
+\begin{itemize}
+    \item \textbf{df}: The dataframe that contains the data
+    \item \textbf{sorting\_car}: The variable that will be used to sort the stocks
+    \item \textbf{number\_of\_portfolios}: The number of portfolios that will be created
+    \item \textbf{weighting}: The type of weighting that will be used to calculate the portfolio return. The default is "Equal" weighting.
+\end{itemize}
+
+\begin{lstlisting}[language=Python, caption= Python function to create portfolios, label={pcode:3a}, escapechar=|, frame=single, basicstyle=\small, showstringspaces=false, captionpos=b, breaklines=true, showspaces=false, showtabs=false, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+    def get_portfolios(df, sorting_car, number_of_portfolios,weighting = 'Equal'):
+    portfoli_df = df.dropna(subset=[sorting_car])[
+        ['t', 'permno', sorting_car, 'me', 'ret']
+    ].copy()
+    portfoli_df['portfolios'] = portfoli_df.groupby('t')[sorting_car].transform(lambda x: pd.qcut(x, number_of_portfolios, labels=False)) 
+    portfoli_df['portfolios'] = portfoli_df['portfolios'] + 1   # The highest value is the highest portfolio
+    if weighting == 'market':
+        portfoli_df['weight'] = portfoli_df.groupby(['t','portfolios'])['me'].transform(lambda x: x/sum(x))
+        portfoli_df['ret'] = portfoli_df['ret'] * portfoli_df['weight']
+    elif weighting == 'Equal':
+        portfoli_df['weight'] = portfoli_df.groupby(['t','portfolios'])['me'].transform(lambda x: 1/len(x))
+        portfoli_df['ret'] = portfoli_df['ret'] * portfoli_df['weight']
+    return portfoli_df.groupby(['t','portfolios']).ret.sum().unstack().reset_index().rename(columns = {"t":"month"})
+\end{lstlisting}
+
+\begin{enumerate}[(a)]
+\item Here is the result of the function for the "Equal" weighting. (Figure \ref{fig:3a})
+\begin{figure}[htbp!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Out/3_1.pdf}
+    \caption{Time series of the average returns of the portfolios based on the "Equal" weighting.}
+    \label{fig:3a}
+\end{figure}
+
+\item Here is the result of the function for the "Market" weighting. (Figure \ref{fig:3b})
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{Out/3_2.pdf}
+    \caption{Time series of the average returns of the portfolios based on the "Market" weighting.}
+    \label{fig:3b}
+\end{figure}
+
+\item Here we create the long-short portfolio. The long-short portfolio is created by taking the difference between the returns of the highest and the lowest portfolio. The result is shown in the figure \ref{fig:3c}.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{Out/3_3.pdf}
+    \caption{Time series of the average returns of the long-short portfolio.}
+    \label{fig:3c}
+\end{figure}
+
+Now we can test the CAPM, Fama-French 3 factors and the Fama-French 5 factors, Carhart, and HXZ models. You can find the function that I write to test the null hypothesis that $\alpha_{LS} =0$. I will get the p-value of the test.   
+
+
+\begin{lstlisting}[language=Python, caption= Python function to run the test, label={pcode:3a}, escapechar=|, frame=single, basicstyle=\small, showstringspaces=false, captionpos=b, breaklines=true, showspaces=false, showtabs=false, keywordstyle=\color{blue}, commentstyle=\color{gray}]
+    def time_series_regression(portfolios, factors, FactorModel):
+    portfolios = portfolios.merge(factors, on='month', how='left')
+    portfolios = portfolios.dropna()
+    X = portfolios[FactorModel]
+    X = sm.add_constant(X)
+    Y = portfolios['long_short']
+    model = sm.OLS(Y, X).fit(cov_type='HAC',cov_kwds={'maxlags':int(len(Y)**0.25)}) 
+    pvalues = model.pvalues
+    betas = model.params
+    return [betas.iloc[0],pvalues.iloc[0]]
+\end{lstlisting}
+
+\begin{table}[htbp]
+    \caption{$\alpha$ test for long-short portfolio with different models}
+    \begin{tabularx}{\linewidth}{CC}
+        \caption*{Equal Weighted }
+        \input{Out/3_c1.tex}
+        &
+        \caption*{Market Weighted }
+        \input{Out/3_c2.tex}
+    \end{tabularx}
+\end{table}
+\item 
+
+\begin{table}[htbp]
+    \caption{$\alpha$ test long-short portfolio for in and out of sample with equal weighting}
+    \begin{tabularx}{\linewidth}{CC}
+        \caption*{Sample period }
+        \input{Out/3_d1_in.tex}
+        &
+        \caption*{Post-publication period}
+        \input{Out/3_d1_out.tex}
+    \end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+    \caption{$\alpha$ test long-short portfolio for in and out of sample with market weighting}
+    \begin{tabularx}{\linewidth}{CC}
+        \caption*{Sample period }
+        \input{Out/3_d2_in.tex}
+        &
+        \caption*{Post-publication period}
+        \input{Out/3_d2_out.tex}
+    \end{tabularx}
+\end{table}
+
+
+\end{enumerate}

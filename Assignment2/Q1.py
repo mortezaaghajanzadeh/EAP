@@ -12,10 +12,10 @@ consumption_df
 
 # function to calculate the mean, standard deviation and first-order autocorrelation coefficient
 def mean_std_autocorr(df,column_name):
-    g = df[column_name].to_numpy()
+    g = df[column_name].copy()
     mean = g.mean()
     std = g.std()
-    autocorr_1 = np.correlate(g[:-1], g[1:])[0]
+    autocorr_1 = g.autocorr(lag=1)
     return mean, std, autocorr_1
 
 # create a excess return column
@@ -28,22 +28,24 @@ for i in ['ConsGrowth', 'Market', 'Rfree', 'Re']:
     print(f"{i}: mean = {mean: .3f}, std = {std: .3f}, autocorr_1 = {autocorr_1: .3f}")
     estimation_results[i] = [mean, std, autocorr_1]
 
+pd.DataFrame(estimation_results, index=['$\mu$', '$\sigma$', r'$\rho_1$']).rename(columns={'ConsGrowth': '$\Delta c$', 'Market': '$r_{m,t}$', 'Rfree': '$r_{f,t}$', 'Re': '$r_{e,t}$'}).to_latex(data_out + "/1a.tex", float_format="%.3f",)
 #% Sample correlation matrix
 
 # calculate the correlation matrix
-corr_df = consumption_df[['ConsGrowth', 'Market', 'Rfree', 'Re']].corr()
-corr_df
+corr_df = consumption_df[['ConsGrowth', 'Market', 'Rfree', 'Re']].cov()
+
+corr_df.rename(index={'ConsGrowth': '$\Delta c$', 'Market': '$r_{m,t}$', 'Rfree': '$r_{f,t}$', 'Re': '$r_{e,t}$'}, columns={'ConsGrowth': '$\Delta c$', 'Market': '$r_{m,t}$', 'Rfree': '$r_{f,t}$', 'Re': '$r_{e,t}$'}).to_latex(data_out + "/1a_corr.tex", float_format="%.3f",)
 # %% (b)
 # The first estimation:
 gamma_1 = (
-    estimation_results['Re'][0] + estimation_results['Market'][1] ** 2
-    ) / corr_df.loc['Rfree', 'Market']
+    estimation_results['Re'][0] + estimation_results['Market'][1] ** 2 /2
+    ) / corr_df.loc['ConsGrowth', 'Market']
 print(f"The first estimation: gamma = {gamma_1: .3f}")
 
 # The second estimation:
 gamma_2 = (
-    estimation_results['Re'][0] + estimation_results['Market'][1] ** 2
-    ) / estimation_results['Market'][1]/estimation_results['Rfree'][1]
+    estimation_results['Re'][0] + estimation_results['Market'][1] ** 2 /2
+    ) / estimation_results['Market'][1]/estimation_results['ConsGrowth'][1]
 print(f"The second estimation: gamma = {gamma_2: .3f}",)
 # %% (c)
 delta_1 = np.exp(-1 * (estimation_results['Rfree'][0] - gamma_1 * estimation_results['ConsGrowth'][0] + 0.5 * gamma_1**2 * estimation_results['ConsGrowth'][1]**2 ))
@@ -102,7 +104,7 @@ def s_newywest(theta,x,lag,x_df):
     gamma_hat = gamma(theta,x,lag,x_df)
     return sum([s(theta,i) for i in x])/len(x) + 0.5 * (gamma_hat + gamma_hat.T)
 s_hat_newywest = s_newywest(theta,x,lag,x_df)
-s_hat_newywest 
+pd.DataFrame(s_hat_newywest, columns =['$\mu_c$', '$\mu_m$', '$\gamma$', '$\delta$'], index =['$\mu_c$', '$\mu_m$', '$\gamma$', '$\delta$']).to_latex(data_out + "/1d.tex", float_format="%.4f")
 
 # %% (e)
 
@@ -118,12 +120,23 @@ def f_v(theta,x):
         np.exp(np.log(delta) - gamma * x_c + r_f) - 1,
         ]).reshape(len(theta),1)
     return f
-first_guess = np.array([gamma_1, delta_1])
+
 def FOC(theta,x):
     return sum([f_v(theta,i) for i in x])/len(x)
+
 def loss(theta,x):
     return (FOC(theta,x).T @ FOC(theta,x))[0][0]
+
+
 import numpy as np
 from scipy.optimize import minimize
+first_guess = np.array([gamma_1, delta_1])
 res = minimize(loss, first_guess, args=(x), method='BFGS', options={'disp': True})
-s_newywest(res.x,x,lag,x_df)
+
+pd.DataFrame(res.x,columns = [r'$\hat{\theta}$'],index = ['$\gamma$',"$\delta$"]).T.to_latex(data_out + "/1e.tex", float_format="%.2f")
+print(f"The estimation of the gamma with the new method: gamma = {res.x[0]: .3f} and with the old method: gamma = {gamma_1: .3f}")
+print(f"The estimation of the delta with the new method: delta = {res.x[1]: .3f} and with the old method: delta = {delta_1: .3f}")
+
+sd_newywest = s_newywest(res.x,x,lag,x_df)
+pd.DataFrame(sd_newywest,columns =  ['$\gamma$',"$\delta$"],index = ['$\gamma$',"$\delta$"]).to_latex(data_out + "/1e_sd.tex", float_format="%.4f")
+pd.DataFrame(sd_newywest,columns =  ['gamma',"delta"],index = ['gamma',"delta"])
