@@ -131,7 +131,7 @@ def loss(theta,x):
 
 import numpy as np
 from scipy.optimize import minimize
-first_guess = np.array([gamma_1, delta_1])
+first_guess = np.array([0, 0])
 res = minimize(loss, first_guess, args=(x), method='BFGS', options={'disp': True})
 
 pd.DataFrame(res.x,columns = [r'$\hat{\theta}$'],index = ['$\gamma$',"$\delta$"]).T.to_latex(data_out + "/1e.tex", float_format="%.2f")
@@ -141,3 +141,5 @@ print(f"The estimation of the delta with the new method: delta = {res.x[1]: .3f}
 sd_newywest = s_newywest(res.x,x,lag,x_df)
 pd.DataFrame(sd_newywest,columns =  ['$\gamma$',"$\delta$"],index = ['$\gamma$',"$\delta$"]).to_latex(data_out + "/1e_sd.tex", float_format="%.4f")
 pd.DataFrame(sd_newywest,columns =  ['gamma',"delta"],index = ['gamma',"delta"])
+
+# %%

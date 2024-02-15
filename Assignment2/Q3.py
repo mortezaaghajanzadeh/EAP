@@ -233,3 +233,5 @@ pd.DataFrame(test_mkt_out_results,index = [r'$\alpha$','$Pvalue$']).T.to_latex(d
 
 
 
+
+# %%

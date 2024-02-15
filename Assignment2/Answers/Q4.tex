@@ -1,19 +1,24 @@
 \section*{Question 4}
-
+Here, I replicated all the results from the previous question by implementing three changes in the data:
+\begin{itemize}
+    \item I create 10 portfolios based on the characteristic of the stocks.
+    \item I exclude the stocks with a price lower than 5 dollars.
+    \item I exclude the stocks with a market capitalization lower than 20 percentiles of the market capitalization each month.
+\end{itemize}
 
 \begin{enumerate}[(a)]
+    \setcounter{enumi}{2}
+\item 
+The cumulative return of long-short portfolio is shown in the figure \ref{fig:4c}. The pattern is quiet similar to the previous question. The cumulative return for equal weighted is higher that value weighted. 
 
-\item Here we create the long-short portfolio. The long-short portfolio is created by taking the difference between the returns of the highest and the lowest portfolio. The result is shown in the figure \ref{fig:3c}.
 \begin{figure}
     \centering
     \includegraphics[width=0.6\textwidth]{Out/4_3.pdf}
     \caption{Time series of the average returns of the long-short portfolio.}
-    \label{fig:3c}
+    \label{fig:4c}
 \end{figure}
 
-Now we can test the CAPM, Fama-French 3 factors and the Fama-French 5 factors, Carhart, and HXZ models. You can find the function that I write to test the null hypothesis that $\alpha_{LS} =0$. I will get the p-value of the test.   
-
-
+Now you can see the $\alpha$ test for long-short portfolio with different models in the table \ref{tab:4c}. The results are in line with the previous question but the statistical significance is lower.
 
 \begin{table}[htbp]
     \caption{$\alpha$ test for long-short portfolio with different models}
@@ -25,7 +30,7 @@ Now we can test the CAPM, Fama-French 3 factors and the Fama-French 5 factors, C
         \input{Out/4_c2.tex}
     \end{tabularx}
 \end{table}
-\item 
+\item Here are the results for the $\alpha$ test for long-short portfolio for in and out of sample with equal weighting and market weighting in the tables \ref{tab:4d1} and \ref{tab:4d2} respectively. 
 
 \begin{table}[htbp]
     \caption{$\alpha$ test long-short portfolio for in and out of sample with equal weighting}
