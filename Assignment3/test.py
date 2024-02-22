@@ -1,11 +1,16 @@
 #%%
 import pandas as pd
 import numpy as np
+from tabulate import tabulate
 import statsmodels.api as sm
 #%%
 data_path = ''
 #%%
 df = pd.read_excel(data_path + 'Assignment3Data.xlsx')
+df.describe()
+df.set_index('month', inplace=True)
+df = np.log(1 + df/100)
+df.reset_index(inplace=True)
 # %%
 n = [i[1:] for i in list(df.columns[1:])]
 for i in n:
@@ -16,7 +21,7 @@ for i in n:
         df['rx'+i] = df['r'+i] - df['y12'].shift(12)     
 df.head(13)
 # %%
-df.describe()
+df.iloc[:,1:].describe()
 #%%
 # FamaBliss 
 def fama_bliss_regression(df, i):
@@ -27,7 +32,7 @@ def fama_bliss_regression(df, i):
     X = tempt_df['control']
     X = sm.add_constant(X)
     Y = tempt_df['rx'+i]
-    model = sm.OLS(Y, X).fit(cov_type='HAC',cov_kwds={'maxlags':int(len(Y)**0.25)}) 
+    model = sm.OLS(Y, X).fit(cov_type='HAC',cov_kwds= {'maxlags': int(len(Y)**0.25)}) 
     coef = model.params
     sd = model.bse
     return (coef, sd)
@@ -57,26 +62,51 @@ def backus_regression(df, i):
     X = tempt_df['control']
     X = sm.add_constant(X)
     Y = tempt_df['Y']
-    model = sm.OLS(Y, X).fit(cov_type='HAC',cov_kwds={'maxlags':int(len(Y)**0.25)}) 
+    model = sm.OLS(Y, X).fit(cov_type='HAC',cov_kwds= {'maxlags':int(len(Y)**0.25)}) 
     coef = model.params
     sd = model.bse
     return (coef, sd)
+
+fama_bliss_regression(df, "24")
+
 #%%
 results = {}  # Create an empty dictionary to store the results
-
+table_data_beta = []
+table_data_alpha = []
 for i in n:
-    print(i)
     num_i = int(i)
     if num_i != 12 and num_i != 24:
         results[i] = {}  # Create a nested dictionary for each regression type
         results[i]['fama_bliss_regression'] = fama_bliss_regression(df, i)
+        print(results[i]['fama_bliss_regression'][0])
         results[i]['campbell_shiller_regression'] = campbell_shiller_regression(df, i)
         results[i]['backus_regression'] = backus_regression(df, i)
 
-# Print the results
-for i, reg_results in results.items():
-    print(f'Results for {i}:')
-    print('fama_bliss_regression', reg_results['fama_bliss_regression'])
-    print('campbell_shiller_regression', reg_results['campbell_shiller_regression'])
-    print('backus_regression', reg_results['backus_regression'])
+        # Append the results to the table data
+        
+        table_data_alpha.append([
+            i,
+            results[i]['fama_bliss_regression'][0][0],
+            results[i]['fama_bliss_regression'][1][0],
+            results[i]['campbell_shiller_regression'][0][0],
+            results[i]['campbell_shiller_regression'][1][0],
+            results[i]['backus_regression'][0][0],
+            results[i]['backus_regression'][1][0]
+        ])
+        table_data_beta.append([
+            i,
+            results[i]['fama_bliss_regression'][0][1],
+            results[i]['fama_bliss_regression'][1][1],
+            results[i]['campbell_shiller_regression'][0][1],
+            results[i]['campbell_shiller_regression'][1][1],
+            results[i]['backus_regression'][0][1],
+            results[i]['backus_regression'][1][1]
+        ])
+
+
+# Define the table headers
+headers = ['i', 'Fama-Bliss Coef', 'Fama-Bliss Std', 'Campbell-Shiller Coef', 'Campbell-Shiller Std', 'Backus Coef', 'Backus Std']
+
+# Print the table
+print(tabulate(table_data_beta, headers=headers))
 # %%
