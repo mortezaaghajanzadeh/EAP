@@ -1,0 +1,127 @@
+\documentclass[hidelinks,12pt]{article}
+\usepackage[a4paper,width=150mm,top=25mm,bottom=25mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{lipsum}
+\usepackage{amssymb}
+\usepackage{apacite}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{ragged2e}
+\usepackage[font={footnotesize,bf}]{caption}
+\usepackage[nottoc,numbib]{tocbibind}
+\usepackage{multirow}
+\usepackage{placeins}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+
+
+\linespread{1.5}
+
+\begin{document}
+
+\begin{titlepage}
+    \begin{center}
+        \vspace*{1cm}
+        
+        
+        % \vfill
+        
+        \large
+        \textbf{Empirical Asset Pricing \\ Assignment 4}
+            
+        
+        \normalsize
+        Seyyed Morteza Aghajanzadeh \\
+        Department of Finance \\
+        Stockholm School of Economics
+        
+        \vfill
+            
+        
+        \vspace{0.8cm}
+        \normalsize
+        \centering
+        2024-01
+            
+    \end{center}
+\end{titlepage}
+
+\section{}
+\subsection*{(a)}
+
+The following table shows the summary statistics of the yields, forward rates, and excess returns. I followed the steps that was given in the assignment to calculate the forward rates and excess returns. Based on the results in table \ref{tab:excess_return_describe}, we can see that the mean of the excess returns is positive. The mean of the excess return increases by bond's maturity. The standard deviation of the excess return is also increasing by bond's maturity which means that longer maturity bonds have higher risk.
+
+\begin{table}[htbp]
+\centering
+\caption{Summary statistics of yields}
+\label{tab:yield_describe}
+\resizebox{!}{!}{\input{out/yield_describe.tex}}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Summary statistics of forward rates}
+\label{tab:forward_describe}
+\resizebox{!}{!}{\input{out/forward_describe.tex}}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Summary statistics of excess returns}
+\label{tab:excess_return_describe}
+\resizebox{!}{!}{\input{out/excess_return_describe.tex}}
+\end{table}
+
+\FloatBarrier
+
+\subsection*{(b)}
+
+In order to provide point estimates, standard errors, and tests of the null hypotheses for the regression results, we followed a specific estimation approach. I estimated the standard errors on the bn estimates using a Newey-West standard error estimation method.
+
+The results of the Fama and Bliss regression, presented in Table \ref{tab:fama_bliss}, show that the coefficients are statistically significant different from zero.
+Similarly, the results of the Campbell and Shiller regression, presented in Table \ref{tab:campbell_shiller}, indicate that the coefficients are statistically significant different from one. 
+On the other hand, the results of the Backus et al. regression, presented in Table \ref{tab:backus_et_al}, show that the coefficients are not statistically significant different from one. 
+
+
+\begin{table}[htbp]
+\centering
+\caption{Fama and Bliss regression results}
+\label{tab:fama_bliss}
+\resizebox{!}{!}{\input{out/fama_bliss.tex}}
+\end{table}
+
+
+\begin{table}[htbp]
+    \centering
+    \caption{Campbell and Shiller regression results}
+    \label{tab:campbell_shiller}
+    \resizebox{!}{!}{\input{out/campbell_shiller.tex}}
+    \end{table}
+
+
+
+\begin{table}[htbp]
+    \centering
+    \caption{Bakus et al. regression results}
+    \label{tab:backus_et_al}
+    \resizebox{!}{!}{\input{out/backus.tex}}
+    \end{table}
+
+
+\appendix
+
+\section*{Appendix}
+
+Here you can find the python code that I used to solve the exercise. \href{https://github.com/mortezaaghajanzadeh/BDAP/tree/main/Assignments/Assignment4}{Link to the GitHub repository.}
+
+\end{document}
